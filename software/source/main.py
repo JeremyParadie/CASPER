@@ -1,5 +1,5 @@
 """
-The mian file for a the CASPER project. Manages GUI threads, I/O, etc
+The main file for a the CASPER project. Manages GUI threads, I/O, etc
 
 Authors: Per Van Dyke, Ian MacPherson
 """
