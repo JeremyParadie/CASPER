@@ -18,7 +18,7 @@ def main(self, port):
     docs here
     """
     #make the object representing the relay
-	com = communication.comsClass(portSelection=port) #FIXME: use underscores / lower case
+	com = communication.Radio(port=port)
 
 	GUI = GUIX.GUI()
 	GUIq = queue.PriorityQueue()
