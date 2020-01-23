@@ -1,3 +1,8 @@
+"""
+The file which handles I/O functions for the CASPER project.
+
+Author: Per Van Dyke
+"""
 import serial
 import queue
 import time

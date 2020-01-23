@@ -1,3 +1,8 @@
+"""
+The file which contains all of the commands that can be sent to the robot for the CASPER project.
+
+Author: Ian MacPherson
+"""
 import Logger
 import os
 
