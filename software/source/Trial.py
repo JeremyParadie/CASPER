@@ -1,4 +1,4 @@
-import Logger
+import logger
 import os
 
 
@@ -15,7 +15,7 @@ class Trial:
         while (csvExists == True):
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
-        self.logger = Logger.Logger("logs/" + name + str(i) + ".csv")
+        self.logger = logger.Logger("logs/" + name + str(i) + ".csv")
 
     def getName(self):
         return self.name

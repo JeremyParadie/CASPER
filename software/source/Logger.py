@@ -6,5 +6,5 @@ class Logger:
 		self.log = open(csvFile, 'w')
 		self.writer = csv.writer(self.log, delimiter=',')
 
-	def writeLog(self, time, event):
+	def write(self, time, event):
 		self.writer.writerow([time, event])
