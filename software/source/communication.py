@@ -44,5 +44,5 @@ class Radio():
             response += incoming
             if response.endswith('\n'):
                 return([response])
-
+        
         return(["Message Read Error"])
