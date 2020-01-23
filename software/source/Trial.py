@@ -4,11 +4,11 @@ import os
 
 class Trial:
 
-    def __init__(self, name="Default_Trial", trial=["tailSetAngle(50, 1)", "tailSetAngle(20, 1.5)", "tailSetAngle(50, 2)", "tailSetAngle(20, 2.5)", "tailSetAngle(50, 3)", "tailSetAngle(20, 3.5)", "tailSetAngle(50, 4)", "tailSetAngle(20, 4.5)", "tailSetAngle(50, 5)", "tailSetAngle(20, 5.5)", "tailSetAngle(-20, 6)", "audioPlay('track004.mp3', 7)", "audioStop(30)"], boolean=False):
+    def __init__(self, name="Default_Trial", trial=["tailSetAngle(50, 1)", "tailSetAngle(20, 1.5)", "tailSetAngle(50, 2)", "tailSetAngle(20, 2.5)", "tailSetAngle(50, 3)", "tailSetAngle(20, 3.5)", "tailSetAngle(50, 4)", "tailSetAngle(20, 4.5)", "tailSetAngle(50, 5)", "tailSetAngle(20, 5.5)", "tailSetAngle(-20, 6)", "audioPlay('track004.mp3', 7)", "audioStop(30)"], DEBUG=False):
         self.name = name
         self.execStack = list(
             map(lambda n: "self.lastOutput = Trial." + n, trial))
-        self.debugMode = boolean
+        self._DEBUG = DEBUG
         self.lastOutput = None
         i = 0
         csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
@@ -110,6 +110,7 @@ class Trial:
         # Note this is not comm sendable.
         # Adds the list of comm sendable functions that would create the intended motion to the stack then does runNextLine
 
+    @staticmethod
     def advancedTailMotion(WIP):
         pass
         # Note this is not comm sendable

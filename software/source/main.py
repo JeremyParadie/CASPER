@@ -67,7 +67,7 @@ def main(self, port):
 				selectedTrial = Trial.Trial(fromGUIq['Trial'], trialTrial)
 			# If the user issues a manual command, send it
 			if 'manualcommand' in fromGUIq:
-				com.send(exec("currentTrial." + fromGUIq['manualcommand']))
+				com.send(getatttr(currentTrial, fromGUIq['manualcommand']))
 				currentTrial.logger.writeLog(timeTicks, fromGUIq['manualcommand'])
 			# Not yet implemented
 			if 'observerEntry' in fromGUIq:
