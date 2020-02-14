@@ -8,9 +8,10 @@
 
 class AudioWrapper{                   //Wrapper class for the VS1053 library- this will make it much easier to work with audio
   private:                            //Private- can't access these directly
-    int errorCount=0;                 //The number of errors since program start or since errors have been wiped
+    unsigned long errorCount=0;        //The number of errors since program start or since errors have been wiped
     String lastError="All good; No errors!";//The default error message, to be replaced with errors when they occur
     Adafruit_VS1053_FilePlayer VS1053b;//The audio object from the VS1053 library, which this class is wrapping. 
+    int volumePercent;
      
   public:                             //Public- feel free to use these
     AudioWrapper();                   //Constructor- gets called automatically when you make an object from this class

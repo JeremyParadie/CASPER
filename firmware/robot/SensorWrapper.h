@@ -1,13 +1,14 @@
 #ifndef SensorWrapper_h
 #define SensorWrapper_h
 
+#include "src/SparkFun_BME280/SparkFunBME280.h"
 #include "Arduino.h"                  //Standard arduino library
 
 class SensorWrapper{                  //Wrapper class for the ____ library- this will make it much easier to work with the ____
   private:                            //Private- can't access these directly
-    int errorCount=0;                 //The number of errors since program start or since errors have been wiped
+    unsigned long errorCount=0;        //The number of errors since program start or since errors have been wiped
     String lastError="All good; No errors!";//The default error message, to be replaced with errors when they occur
-    //Adafruit_____ ____;             //The ____ object from the ____ library, which this class is wrapping. 
+    BME280 Sensor;          //The ____ object from the ____ library, which this class is wrapping. 
     
   public:                             //Public- feel free to use these
     SensorWrapper();                  //Constructor- gets called automatically when you make an object from this class
