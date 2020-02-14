@@ -1,20 +1,6 @@
 import logger
 import os
 
-# When instantiating a trial class both of the inputs, name and trial, should be included. 
-#Their current defaults are for demonstration/testing purposes only.
-
-# The boolean input is for debug (not implemented?)
-
-# Trials currently dont support new lines, so all trialFiles should be one long single line of methods with inputs in parentheses
-#adjacent to their method. Methods should be separated from each other by a comma and a space (", "). The list of methods should be within 
-#square brackets [ ].
-
-# Available methods are technically any executable python code if executed within Trial.py. However only the methods within Trial.py
-#marked with #supportedMethod are supported use.
-
-# If you wish too add new methods they should either return a string that the comms support as a command, or push a sequence of 
-#supported methods onto the exec stack that create the desired behavior
 
 class Trial:
 
@@ -54,96 +40,78 @@ class Trial:
             output.append(Trial.popNextLine(self))
         return output
 
-    #supportedMethod
     def tailGetAngle(time):
         # Note this is comm sendable
         return (time, "Robot Servo 0 getAngle")
 
-    #supportedMethod
     def tailSetAngle(angle, time):
         # Note this is comm sendable
         return (time, "Robot Servo 0 setAngle " + str(angle))
 
-    #supportedMethod
     def tailGoLimp(time):
         # Not this is com sendable
         return (time, "Robot Servo 0 goLimp")
 
-    #supportedMethod
     def coverGetAngle(time):
         # Note this is comm sendable
         return (time, "Robot Servo 1 getAngle")
 
-    #supportedMethod
     def coverSetAngle(angle, time):
         # Note this is comm sendable
         return (time, "Robot Servo 1 setAngle " + str(angle))
 
-    #supportedMethod
     def tailGoLimp(time):
         # Not this is com sendable
         return (time, "Robot Servo 1 goLimp")
 
-    #supportedMethod
     def audioSetVolume(percent, time):
         # Note this is comm sendable
         return (time, "Robot Audio setVolume " + str(percent))
 
-    #supportedMethod
     def audioPlay(fileName, time):
         # Note this is comm sendable
         return (time, "Robot Audio play " + fileName)
 
-    #supportedMethod
     def audioIsPlaying(time):
         # Note this is comm sendable
         return (time, "Robot Audio isPlaying")
 
-    #supportedMethod
     def audioPause(time):
         # Note this is comm sendable
         return (time, "Robot Audio pause")
 
-    #supportedMethod
     def audioResume(time):
         # Note this is comm sendable
         return (time, "Robot Audio resume")
 
-    #supportedMethod
     def audioIsPaused(time):
         # Note this is comm sendable
         return (time, "Robot Audio isPaused")
 
-    #supportedMethod
     def audioStop(time):
         # Note this is comm sendable
         return (time, "Robot Audio stop")
 
-    #supportedMethod
     def audioIsStopped(time):
         # Note this is comm sendable
         return (time, "Robot Audio isStopped")
 
-    #supportedMethod
     def audioGetFileName(time):
         # Note this is comm sendable
         return (time, "Robot Audio getFileName")
 
-    #supportedMethod
     def audioSetVolume(percent, time):
         # Note this is comm sendable
         return (time, "Robot Audio setVolume " + str(percent) + "%")
 
-    #supportedMethod
     def tailMotion(self, positionList, startTime, rate):
         pass
-        # TODO
+        # This doesn't work
         # Note this is not comm sendable.
         # Adds the list of comm sendable functions that would create the intended motion to the stack then does runNextLine
 
-   #supportedMethod
+    @staticmethod
     def advancedTailMotion(WIP):
         pass
-        # TODO
         # Note this is not comm sendable
         # Adds the list of comm sendable functions that would create the intended motion to the stack then does runNextLine
