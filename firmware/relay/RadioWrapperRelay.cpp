@@ -56,7 +56,6 @@ void RadioWrapperRelay::send(String data){   //Sends the passesd string paramete
     data.toCharArray(sendbuffer,data.length()+1);//Transfer 62 chars max into sendbuffer
     sendbuffer[data.length()]='\0';              //Set last element, at index 61, (the 62nd element) to null terminator
     if(RFM69HCW.sendWithRetry(TONODEID, sendbuffer, data.length()+1)){//Send the packet. If successfully received ack,
-      blink();     //Blink the led
     }else{         //Otherwise
       errorCount++;//No ack was recieved, so increment the error count
       lastError="Error: RadioWrapperRelay.send(); Packet sent, no acknowledgement.";//And generate the error
@@ -64,7 +63,7 @@ void RadioWrapperRelay::send(String data){   //Sends the passesd string paramete
   }
 }
 
-String RadioWrapperRelay::receive(){         //Returns a newly received packet, if there is one, and blinks LED pin. If not, returns "No Data Received"
+String RadioWrapperRelay::receive(){         //Returns a newly received packet, if there is one. If not, returns "No Data Received"
   String data;                               //Make a string
   if(RFM69HCW.receiveDone()){                //If there is a packet
     for (byte i=0; i<RFM69HCW.DATALEN; i++){ //The actual message is contained in the DATA array, and is DATALEN bytes in size
@@ -72,7 +71,6 @@ String RadioWrapperRelay::receive(){         //Returns a newly received packet, 
     }
     RSSI=RFM69HCW.RSSI;       //Save the received signal strength indication for later
     RFM69HCW.sendACK();     //Send an ACKnowledgement
-    blink();              //Blink to show that it was a successful transfer
   }else{                    //Otherwise, if there was not a packet,
     data="No Response Received";//Set the data to "No Data Received"
   }
@@ -92,10 +90,3 @@ void RadioWrapperRelay::goToSleep(){//Puts the radio in a low power state. Call 
 void RadioWrapperRelay::wakeFromSleep(){//Wakes the radio from sleep after calling goToSleep()
   RFM69HCW.receiveDone();
 }
-
-void RadioWrapperRelay::blink(){ //Blinks LED on for 10ms to signify a sucessful send or receive
-  digitalWrite(LED,HIGH);   //Turn led on
-  delay(10);                //Wait 10ms
-  digitalWrite(LED,LOW);    //Turn led off
-}
-
