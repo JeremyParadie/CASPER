@@ -43,12 +43,12 @@ class MainWindow(QMainWindow):
         #consoleLog.addScrollBarWidget()
         self.consoleLog.setReadOnly(True)
         self.consoleLog.setMinimumHeight(300)
-        self.consoleLayout.addWidget(consoleLog)
+        consoleLayout.addWidget(self.consoleLog)
 
         self.console = QTextEdit()
         self.console.setMaximumHeight(25)
         #self.console.
-        self.consoleLayout.addWidget(console)
+        consoleLayout.addWidget(self.console)
 
 
 
@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
         
     def LoadJSON(self):
         print("Load JSON here when implemented")
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons", filter = "JSON Files (*.json *.txt)")
 
     def StartTrial(self):
         print("Start trial when implemented")
