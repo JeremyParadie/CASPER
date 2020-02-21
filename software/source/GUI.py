@@ -62,8 +62,8 @@ class GUI():
 		#create Observer entry
 		observer = StringVar()
 		self.entry1 = ttk.Entry(self.mainframe, textvariable=observer)
-		self.entry1.grid(column=1, row=1, sticky=(N))		
-		
+		self.entry1.grid(column=1, row=1, sticky=(N))
+
 		#create label for date entry
 		dateLable = ttk.Label(self.mainframe, text= 'Date')
 		dateLable.grid(column=2, row=0, sticky=(S))
@@ -72,7 +72,7 @@ class GUI():
 		date = StringVar()
 		self.entry2 = ttk.Entry(self.mainframe, textvariable=date)
 		self.entry2.grid(column=2, row=1, sticky=(N))
-		
+
 		#create label for recorder entry
 		recorderLable = ttk.Label(self.mainframe, text= 'Recorder')
 		recorderLable.grid(column=1, row=2, sticky=(S))
@@ -214,7 +214,7 @@ class GUI():
 		splayedBehavior = ttk.Button(self.mainframe, text='w - splayed', command=self.splayedBehaviorDef)
 		splayedBehavior.grid(column=8, row=6)
 		splayedBehavior.bind_all('w', self.splayedBehaviorDef)
-		
+
 		self.root.protocol("WM_DELETE_WINDOW", self.exitWindow)
 		self.root.mainloop()
 		#for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
@@ -227,7 +227,7 @@ class GUI():
 		self.hotKeySend({'Trial':self.trialTypes.get()})
 		self.trialData()
 
-	
+
 
 	def treeBehaviorDef(self, _event=None):
 		self.hotKeySend({'hotkey':'tree'})
@@ -296,14 +296,14 @@ class GUI():
 	def endTrial(self):
 		self.GUIq.put('End Trial')
 		self.hotKeyFrame.destroy()
-		
-	
+
+
 	def trialData(self, event):
 		self.hotKeySend({'observerEntry':self.entry1.get(),'dateEntry':self.entry2.get(),'recorderEntry':self.recorderEntry.get(),
 			'videoPersonEntry':self.videoPersonEntry.get(),'locationEntry':self.locationEntry.get()})
-		
+
 	#Takes whatever is entered in the notes field, appends it to the txt file, and updates the log in the GUI.
-	#def saveNotes(self): 
+	#def saveNotes(self):
 		#if self.name == '' or self.date == '':
 			#entryError = messagebox.showinfo(message='Please fill all required fields.', icon='error', title='Error')
 			#entryError
@@ -347,7 +347,7 @@ class GUI():
 	def advOptFrm(self):
 		#set up advanced options
 		self.advancedframe = Toplevel(self.mainframe)
-		
+
 		#Create label for Coms Log
 		comsLogLabel = ttk.Label(self.advancedframe, text='Communication Log')
 		comsLogLabel.grid(column=2, row=1)
@@ -360,7 +360,7 @@ class GUI():
 		entryVar = StringVar()
 		self.comsEntry = ttk.Entry(self.advancedframe, textvariable=entryVar, width=66)
 		self.comsEntry.grid(column=2, row=3)
-		
+
 		#Create Coms Entry Button
 		comsButton = ttk.Button(self.advancedframe, text='Submit', command=self.manualCommand)
 		comsButton.grid(column=3, row=3)
