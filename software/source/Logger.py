@@ -1,3 +1,8 @@
+"""
+Very simple file which handles the actual logging of data to CSV for the CASPER project
+
+Author: Ian MacPherson
+"""
 import csv
 
 class Logger:

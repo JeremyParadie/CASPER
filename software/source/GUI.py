@@ -1,3 +1,8 @@
+"""
+The file which creates and runs the GUI for the CASPER project.
+
+Author: Per Van Dyke
+"""
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox

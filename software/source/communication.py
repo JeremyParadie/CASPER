@@ -1,11 +1,27 @@
+"""
+The file which handles I/O functions for the CASPER project.
+
+Author: Per Van Dyke
+"""
 import serial
 import queue
 import time
 
 class Radio():
 
-    def __init__(self, port, baudrate=9600, timeout=0):
+    def __init__(self, port, baudrate=9600, timeout=0, Q):
         self.serial_port = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        commsLoop(Q)
+
+
+    def commsLoop(self, Q):
+    	while(true):
+    		if(Q.peek()[0] == "radio"):
+    			command = queue.get()
+    			if(command[2] == "send"):
+    				send(command[3])
+    				response = receive()
+    				Q.put((command[1],"radio","response",response))
 
     #Takes one argument (The string to be sent), adds a newline, and encodes/sends it.
     def send(self, command):
