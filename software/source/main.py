@@ -1,99 +1,71 @@
 """
-The main file for the CASPER project. Manages GUI threads, I/O, etc
+The entry point to the Graphical user user interface for the capser project
+trial software.
 
-Authors: Per Van Dyke, Ian MacPherson
+Author: Jonah Yolles-Murphy
+
+
+...
+FIXME: talk about the project architecture here.
+...
 """
-import communication
-import Trial
-import GUIX
-import serial
-import queue
+# import normal packages
 import threading
-import re
-import time
+
+#import threads
+import user_interface as ui
+import radio_communication as radio
+import trial_interpreter as ti
+#FIXME: import debug_...
+
+#initialize the message_que for communitcation
+#que is a shortening of the word queue
+message_que = [] # might become a dqueue, depends
+
+#### define the task threads ####
+#   each thread is a daemon so it terminates when this file exits
+threads = []
+args = (message_que,)
+
+ui_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
+threads.append(ti_thread)
+
+radio_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
+threads.append(radio_thread)
+
+ti_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
+threads.append(ti_thread)
 
 
-def main(self, port):
+### define main task threads resources and loop ###
+
+def loop(que):
     """
-    docs here
+    desc: the loop used to onitor the message_que for exit commands;
     """
-    #make the object representing the relay
-	com = communication.Radio(port=port)
 
-	GUI = GUIX.GUI()
-	GUIq = queue.PriorityQueue()
+    #setp goes here:
+    #    instantiang classes
 
-	currentTrial = None
-	selectedTrial = Trial.Trial()
-	commandq = queue.PriorityQueue()
-	exitq = queue.Queue()
+    while True:
 
-	GUIThread = threading.Thread(target=GUI.Main, name='GUIThread', args=(GUIq,commandq,exitq), daemon=True)
-	GUIThread.start()
+        #if the que's first message is adressed to main (may implememnt total loop through later)
+        if que[0].startswith('main'):
+            # fetch the message from the top of the que
+            addr, retaddr, args  = que.pop(0)
+            # parse the adress into just the command by spitiling and disposing
+            # of the first item
+            cmd = addr.split('.')[1:]
 
-    transmissionBuffer = []
-	loopNumber = 0
-	run = True
-	trialRun = False
-	startTicks = time.time()
-	timeTicks = 0
+            # if the head of the command is exit, exit the program
+            if cmd[0] == 'exit':
+                exit() #b/c the threads are daemons they will die along with this one
 
-	while run == True:
-		timeTicks = (time.time() - startTicks)
 
-		if currentTrial != selectedTrial:
-			currentTrial = selectedTrial
-			trialRun = True
-			timeTicks = 0
-			commandq = queue.PriorityQueue()
-			commands = currentTrial.popAllLines()
-			for i in range(len(commands)):
-				commandq.put(commands[i])
-
-		while GUIq.empty() == False:
-			fromGUIq = GUIq.get()
-			print(fromGUIq)
-			# If trial is over, end it
-			if fromGUIq == 'End Trial':
-				trialRun = False
-			# If queue contains a hotkey command, log it
-			if 'hotkey' in fromGUIq:
-				currentTrial.logger.writeLog(timeTicks, fromGUIq['hotkey'])
-			# Open the selected trial from the GUI and set it accordingly in main
-			if 'Trial' in fromGUIq:
-				trialFile = open(r'trials/' + fromGUIq['Trial'], "r")
-				trialString = trialFile.read()
-				trialTrial = [x.strip() for x in trialString.split(' , ')]
-				selectedTrial = Trial.Trial(fromGUIq['Trial'], trialTrial)
-			# If the user issues a manual command, send it
-			if 'manualcommand' in fromGUIq:
-				com.send(getatttr(currentTrial, fromGUIq['manualcommand']))
-				currentTrial.logger.writeLog(timeTicks, fromGUIq['manualcommand'])
-			# Not yet implemented
-			if 'observerEntry' in fromGUIq:
-				pass
-
-			# If there are no commands, but trial should be continuing, check connection.
-			# Need Ian to confirm this
-			if commandq.empty() == False and trialRun == True:
-				if commandq.queue[0][0] <= timeTicks:
-					if (timeTicks - commandq.queue[0][0]) > 1:
-						print("running " + str (timeTicks - commandq.queue[0][0]) + " slow")
-					command = commandq.get()[1]
-					commandReturn = com.send(command)
-					print(commandReturn)
-					if re.match("^OK", commandReturn[0]) == None:
-						#TODO Log Error
-						print("failed reception")
-					else:
-						currentTrial.logger.writeLog(timeTicks, command)
-			# If the user closes the GUI, exit cleanly
-			if exitq.empty() == False:
-				break
-			#print(timeTicks)
-			#print(GUIThread.is_alive())
-			loopNumber = loopNumber + 1
-
+#if this is the name main file start all the threads, enter main loop
 if __name__ == '__main__':
-    port = input('select the port for the Relay:')
-    main(port)
+    ui_thread.start()
+    radio_thread.start()
+    ti_thread.start()
+
+    loop(que)
