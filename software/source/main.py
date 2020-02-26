@@ -41,7 +41,7 @@ threads.append(ti_thread)
 
 def loop(que):
     """
-    desc: the loop used to onitor the message_que for exit commands ;
+    desc: the loop used to onitor the message_que for exit commands;
     """
 
     #setp goes here:
@@ -51,16 +51,14 @@ def loop(que):
 
         #if the que's first message is adressed to main (may implememnt total loop through later)
         if que[0].startswith('main'):
-
             # fetch the message from the top of the que
-            msg = que.pop(0)
-
+            addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing
             # of the first item
-            cmd = msg[0].split('.')[1:]
+            cmd = addr.split('.')[1:]
 
             # if the head of the command is exit, exit the program
-            if cmd == 'exit':
+            if cmd[0] == 'exit':
                 exit() #b/c the threads are daemons they will die along with this one
 
 
