@@ -60,14 +60,15 @@ class MainWindow(QMainWindow):
     def LoadJSON(self):
         print("Load JSON here when implemented")
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons", filter = "JSON Files (*.json *.txt)")
-        with open(selectedJSON[0], "r") as json_file:
+        print(selectedJSON[0])
+        with open(selectedJSON[0]) as json_file:
             buttons = json.load(json_file)
         button_holder = QHBoxLayout()
         button_holder_list = []
-        for button in buttons:
+        for button in buttons["button_list"]:
             button_widget = QPushButton(button)
-            button_holder.addWidget()
-            if button_holder.count >= 5:
+            button_holder.addWidget(button_widget)
+            if button_holder.count() >= 5:
                 button_holder_list.append(button_holder)
                 button_holder = QHBoxLayout()
         for i in range(len(button_holder_list)):
