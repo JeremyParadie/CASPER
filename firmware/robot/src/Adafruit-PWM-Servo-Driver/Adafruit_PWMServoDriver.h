@@ -13,6 +13,8 @@
 
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
+  
+  Modified by Jeremy Paradie on 12/08/18 for the Robotic Squirrel Project at Hampshire College
  ****************************************************/
 
 #ifndef _ADAFRUIT_PWMServoDriver_H
@@ -51,10 +53,11 @@ class Adafruit_PWMServoDriver {
   void setPWMFreq(float freq);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
   void setPin(uint8_t num, uint16_t val, bool invert=false);
+  byte getLastStatus();
 
  private:
+  byte lastStatus=0;
   uint8_t _i2caddr;
-
   uint8_t read8(uint8_t addr);
   void write8(uint8_t addr, uint8_t d);
 };
