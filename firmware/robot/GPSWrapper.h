@@ -21,8 +21,8 @@ class GPSWrapper{                     //Wrapper class for the GPS library- this 
     void read();                      //Reads in a new char from GPS, if there is one. this needs to be called very often, around 1khz (a thousand times per second)
     String getLocation();             //If there is a fix, returns the location in decimal degrees lattitude and longitude. if there isnt a fix, returns "Waiting for fix"
     String getAltitude();             //If there is a fix, returns the altitude in meters. example: "76.5 meters" if there isnt a fix, returns "Waiting for fix"
-    String getTime();                 //Returns the time in â€œHH:MM:SS.SSS UTCâ€� Time is UTC, not timezone or daylight saving offset.
-    String getDate();                 //Returns date in â€œYYYY-MM-DDâ€� format
+    String getTime();                 //Returns the time in "HH:MM:SS.SSS UTC" Time is UTC, not timezone or daylight saving offset.
+    String getDate();                 //Returns date in "YYYY-MM-DD" format
     String getFix();                  //Returns "No fix" "Bad fix" "Good fix" or "Great fix" based on fix and quality
     String getSatelliteCount();       //Returns the number of satellites available in a string
 };

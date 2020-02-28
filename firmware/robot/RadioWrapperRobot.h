@@ -28,7 +28,7 @@ class RadioWrapperRobot{              //Wrapper class for the rfm69 library- thi
     String getSignalStrength();       //Returns the signal strength expressed as a percent- "0%" is a poor signal and "100%" is a strong signal. Value updates when a new packet is received during receive(). 
     void send(String data);           //Sends the passesd string parameter over the radio as a packet. Must be 61 or less characters.
     String receive();                 //Returns a newly received packet, if there is one, and blinks LED pin. If not, returns "No Data Received"
-    String getTemperature();          //Returns the temperature in a string formatted like "30Â°C"  Is not very accurate- just gives an estimate
+    String getTemperature();          //Returns the temperature in a string formatted like "30°C"  Is not very accurate- just gives an estimate
     void goToSleep();                 //Puts the radio in a low power state. Call wakeFromSleep() to turn it back on
     void wakeFromSleep();             //Wakes the radio from sleep some time after calling goToSleep()
 };

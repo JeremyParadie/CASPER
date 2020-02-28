@@ -66,7 +66,7 @@ String GPSWrapper::getAltitude(){//If there is a fix, returns the altitude in me
     else{return String(GPS.altitude,1)+String(" meters");}
 }
 
-String GPSWrapper::getTime(){                   //returns the time in â€œHH:MM:SS.SSS UTCâ€� Time is UTC, not timezone or daylight saving offset.
+String GPSWrapper::getTime(){                   //returns the time in "HH:MM:SS.SSS UTC" Time is UTC, not timezone or daylight saving offset.
   parse();//looks for new sentence from the GPS and parses it
   String Time="";                               //make a blank string
   if(GPS.hour<10){Time.concat("0");}            //add a "0" if there is less than 10 hours
@@ -85,9 +85,9 @@ String GPSWrapper::getTime(){                   //returns the time in â€œHH:
   return Time;                                  //return formatted time
 }
 
-String GPSWrapper::getDate(){                   //returns date in â€œYYYY-MM-DDâ€� format
+String GPSWrapper::getDate(){                   //returns date in "YYYY-MM-DD" format
   parse();//looks for new sentence from the GPS and parses it
-  return String("20")+String(GPS.year)+String("-")+String(GPS.month)+String("-")+String(GPS.day); //return date in â€œYYYY-MM-DDâ€� format
+  return String("20")+String(GPS.year)+String("-")+String(GPS.month)+String("-")+String(GPS.day); //return date in "YYYY-MM-DD" format
 }
 
 String GPSWrapper::getFix(){                                            //returns "No fix" "Bad fix" "Good fix" or "Great fix" based on fix and quality

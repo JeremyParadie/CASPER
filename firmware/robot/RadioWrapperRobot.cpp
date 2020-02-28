@@ -81,9 +81,9 @@ String RadioWrapperRobot::receive(){         //Returns a newly received packet, 
   return data;//Return the string
 }
 
-String RadioWrapperRobot::getTemperature(){//Returns the temperature in a string formatted like "30Â°C"  Is not very accurate- just gives an estimate
+String RadioWrapperRobot::getTemperature(){//Returns the temperature in a string formatted like "30°C"  Is not very accurate- just gives an estimate
   String temp=String(RFM69HCW.readTemperature(TEMPOFFSET),DEC);//Read the temperature from the radio's temp sensor, and put it into a string as a decimal number
-  temp.concat(String(char(248))+"C"); //Tack on a Â°C at the end
+  temp.concat(String(char(248))+"C"); //Tack on a °C at the end
   return temp;        //Return the string
 }
 
