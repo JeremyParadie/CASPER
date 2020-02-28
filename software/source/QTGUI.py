@@ -1,4 +1,5 @@
 import sys
+import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -19,14 +20,14 @@ class MainWindow(QMainWindow):
     def SetupWindow(self):
         self.setWindowTitle("CASPER")
         
-        mainColumn = QVBoxLayout()
+        self.mainColumn = QVBoxLayout()
 
         upperButtons = QHBoxLayout()
         upperButtons.setSpacing(500)
-        mainColumn.addLayout(upperButtons)
+        self.mainColumn.addLayout(upperButtons)
 
         consoleLayout = QVBoxLayout()
-        mainColumn.addLayout(consoleLayout)
+        self.mainColumn.addLayout(consoleLayout)
 
 
         start = QPushButton("Start Trial")
@@ -53,12 +54,27 @@ class MainWindow(QMainWindow):
 
 
         widget = QWidget()
-        widget.setLayout(mainColumn)
+        widget.setLayout(self.mainColumn)
         self.setCentralWidget(widget)
         
     def LoadJSON(self):
         print("Load JSON here when implemented")
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons", filter = "JSON Files (*.json *.txt)")
+        with open(selectedJSON[0], "r") as json_file:
+            buttons = json.load(json_file)
+        button_holder = QHBoxLayout()
+        button_holder_list = []
+        for button in buttons:
+            button_widget = QPushButton(button)
+            button_holder.addWidget()
+            if button_holder.count >= 5:
+                button_holder_list.append(button_holder)
+                button_holder = QHBoxLayout()
+        for i in range(len(button_holder_list)):
+            self.mainColumn.addLayout(button_holder_list[i])
+                
+
+
 
     def StartTrial(self):
         print("Start trial when implemented")
