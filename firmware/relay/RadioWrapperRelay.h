@@ -17,14 +17,13 @@ class RadioWrapperRelay{              //Wrapper class for the rfm69 library- thi
     int errorCount=0;                 //The number of errors since program start or since errors have been cleared
     String lastError="All good; No errors!";//The default error message, to be replaced with errors when they occur
     int RSSI=-100;                    //The signal strength expressed between -100 (poor signal) to -25 (strong signal)
-    RFM69 RFM69HCW;                   //The radio object from the RFM69 library, which this class is wrapping. 
-    void blink();                     //Blinks LED on for 10ms to signify a sucessful send or receive
+    RFM69 RFM69HCW;                   //The radio object from the RFM69 library, which this class is wrapping.
     
   public:                             //Public- feel free to use these
     RadioWrapperRelay();              //Constructor- gets called automatically when you make an object from this class
     void initialize();                //Call this once before you use any of the other functions below. Configures radio settings. 
     String clearErrors();             //Replaces the error with "All good; No errors!" and sets errorCount to 0. Returns "OK"
-    String getLastError();                //Returns the last error that occured (string)
+    String getLastError();            //Returns the last error that occured (string)
     String getErrorCount();           //Returns the number of errors that have occured since the program start or since clearErrors() was called (string)
     String getSignalStrength();       //Returns the signal strength expressed as a percent- "0%" is a poor signal and "100%" is a strong signal. Value updates when a new packet is received during receive(). 
     void send(String data);           //Sends the passesd string parameter over the radio as a packet. Must be 61 or less characters.

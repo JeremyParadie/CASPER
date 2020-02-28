@@ -20,7 +20,7 @@ void RadioWrapperRobot::initialize(){//Call this once before you use any of the 
     return;                       //return 
   }
   errorCount++;                   //If initialization failed, increment the error count
-  lastError="Error: RadioWrapper.initialize(); Initialization failure.";//And generate the error
+  lastError="Error: RadioWrapper.initialize(); Initialization failed.";//And generate the error
   return;                         //return
 }
 
@@ -35,6 +35,7 @@ String RadioWrapperRobot::getLastError(){//Returns the last error that occured (
 }
 
 String RadioWrapperRobot::getErrorCount(){//Returns the number of errors that have occured since the program start or since clearErrors() was called (String)
+  errorCount=errorCount%10000000;//use the remainder to limit the size of the number. The effect is that it'll rollover when it gets too big.
   String count=String(errorCount,DEC);//Convert from number to string
   return count;//Return the string
 }
@@ -57,7 +58,6 @@ void RadioWrapperRobot::send(String data){   //Sends the passesd string paramete
     data.toCharArray(sendbuffer,data.length()+1);//Transfer 62 chars max into sendbuffer
     sendbuffer[data.length()]='\0';              //Set last element, at index 61, (the 62nd element) to null terminator
     if(RFM69HCW.sendWithRetry(TONODEID, sendbuffer, data.length()+1)){//Send the packet. If successfully received ack,
-      blink();     //Blink the led
     }else{         //Otherwise
       errorCount++;//No ack was recieved, so increment the error count
       lastError="Error: RadioWrapper.send(); Packet sent, no acknowledgement.";//And generate the error
@@ -65,7 +65,7 @@ void RadioWrapperRobot::send(String data){   //Sends the passesd string paramete
   }
 }
 
-String RadioWrapperRobot::receive(){         //Returns a newly received packet, if there is one, and blinks LED pin. If not, returns "No Data Received"
+String RadioWrapperRobot::receive(){         //Returns a newly received packet, if there is one. If not, returns "No Data Received"
   String data;                               //Make a string
   if(RFM69HCW.receiveDone()){                //If there is a packet
     for (byte i=0; i<RFM69HCW.DATALEN; i++){ //The actual message is contained in the DATA array, and is DATALEN bytes in size
@@ -75,16 +75,15 @@ String RadioWrapperRobot::receive(){         //Returns a newly received packet, 
     }
     RSSI=RFM69HCW.RSSI;     //Save the received signal strength indication for later
     RFM69HCW.sendACK();     //Send an ACKnowledgement
-    blink();                //Blink to show that it was a successful transfer
   }else{                    //Otherwise, if there was not a packet,
     data="No Data Received";//Set the data to "No Data Received"
   }
   return data;//Return the string
 }
 
-String RadioWrapperRobot::getTemperature(){//Returns the temperature in a string formatted like "30°C"  Is not very accurate- just gives an estimate
+String RadioWrapperRobot::getTemperature(){//Returns the temperature in a string formatted like "30Â°C"  Is not very accurate- just gives an estimate
   String temp=String(RFM69HCW.readTemperature(TEMPOFFSET),DEC);//Read the temperature from the radio's temp sensor, and put it into a string as a decimal number
-  temp.concat("°C"); //Tack on a °C at the end
+  temp.concat(String(char(248))+"C"); //Tack on a Â°C at the end
   return temp;        //Return the string
 }
 
@@ -96,9 +95,4 @@ void RadioWrapperRobot::wakeFromSleep(){//Wakes the radio from sleep after calli
   RFM69HCW.receiveDone();
 }
 
-void RadioWrapperRobot::blink(){ //Blinks LED on for 10ms to signify a sucessful send or receive
-  digitalWrite(LED,HIGH);   //Turn led on
-  delay(10);                //Wait 10ms
-  digitalWrite(LED,LOW);    //Turn led off
-}
 
