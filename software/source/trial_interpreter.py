@@ -1,6 +1,11 @@
 import logger
 import os
 
+#TODO Recieve Commands:
+#Trial.load
+#Trial.start
+#Trial.end
+
 # When instantiating a trial class both of the inputs, name and trial, should be included.
 #Their current defaults are for demonstration/testing purposes only.
 
