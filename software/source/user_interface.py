@@ -3,6 +3,7 @@ import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+row_length = 5
 
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QMainWindow):
@@ -63,16 +64,35 @@ class MainWindow(QMainWindow):
         print(selectedJSON[0])
         with open(selectedJSON[0]) as json_file:
             buttons = json.load(json_file)
-        button_holder = QHBoxLayout()
+        '''button_holder0 = QHBoxLayout()
+        button_holder1 = QHBoxLayout()
+        button_holder2 = QHBoxLayout()
+        button_holder3 = QHBoxLayout()
+        button_holder4 = QHBoxLayout()
+        button_holder5 = QHBoxLayout()
+        button_holder6 = QHBoxLayout()
+        button_holder_list = [button_holder0, button_holder1, button_holder2, button_holder3, button_holder4, button_holder5, button_holder6]'''
         button_holder_list = []
+        for _ in range(((len(buttons["button_list"])//row_length)+1)):
+            button_holder_list.append(QHBoxLayout())
+
+        using_buttons_list = []
+        holder_list_index = 0
+        button_index = 0
+        print(len(buttons["button_list"]))
         for button in buttons["button_list"]:
             button_widget = QPushButton(button)
-            button_holder.addWidget(button_widget)
-            if button_holder.count() >= 5:
-                button_holder_list.append(button_holder)
-                button_holder = QHBoxLayout()
-        for i in range(len(button_holder_list)):
-            self.mainColumn.addLayout(button_holder_list[i])
+            button_holder_list[holder_list_index].addWidget(button_widget)
+            if button_holder_list[holder_list_index].count() >= 5:
+                using_buttons_list.append(button_holder_list[holder_list_index])
+                holder_list_index = holder_list_index+1
+            elif button_index == len(buttons["button_list"])-1:
+                using_buttons_list.append(button_holder_list[holder_list_index])
+            button_index = button_index+1
+
+        print(len(using_buttons_list))
+        for i in range(len(using_buttons_list)):
+            self.mainColumn.addLayout(using_buttons_list[i])
                 
 
 
