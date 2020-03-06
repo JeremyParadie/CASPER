@@ -181,8 +181,12 @@ def loop(que):
         cmd_type = cmd[0] # convieneient for below
 
         if cmd_type == 'start':
+            if len(args) == 3:
+                current_trial = Trial(args[0], args[1], args[2])
+            else:
+                current_trial = Trial(args[0], args[1])
 
         elif cmd_type == 'end':
-
+            current_trial.logger.log.close()
         else:
             #error command not found
