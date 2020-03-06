@@ -13,6 +13,8 @@
 
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
+  
+  Modified by Jeremy Paradie on 12/08/18 for the Robotic Squirrel Project at Hampshire College
  ****************************************************/
 
 #include "Adafruit_PWMServoDriver.h"
@@ -36,6 +38,9 @@ void Adafruit_PWMServoDriver::begin(void) {
  reset();
 }
 
+byte Adafruit_PWMServoDriver::getLastStatus(){
+  return lastStatus;
+}
 
 void Adafruit_PWMServoDriver::reset(void) {
  write8(PCA9685_MODE1, 0x0);
@@ -58,14 +63,22 @@ void Adafruit_PWMServoDriver::setPWMFreq(float freq) {
   }
   
   uint8_t oldmode = read8(PCA9685_MODE1);
+  byte temp=lastStatus;
   uint8_t newmode = (oldmode&0x7F) | 0x10; // sleep
   write8(PCA9685_MODE1, newmode); // go to sleep
+  if(lastStatus<temp){lastStatus=temp;}
+  temp=lastStatus;
   write8(PCA9685_PRESCALE, prescale); // set the prescaler
+  if(lastStatus<temp){lastStatus=temp;}
+  temp=lastStatus;
   write8(PCA9685_MODE1, oldmode);
+  if(lastStatus<temp){lastStatus=temp;}
+  temp=lastStatus;
   delay(5);
   write8(PCA9685_MODE1, oldmode | 0xa1);  //  This sets the MODE1 register to turn on auto increment.
                                           // This is why the beginTransmission below was not working.
   //  Serial.print("Mode now 0x"); Serial.println(read8(PCA9685_MODE1), HEX);
+  if(lastStatus<temp){lastStatus=temp;}
 }
 
 void Adafruit_PWMServoDriver::setPWM(uint8_t num, uint16_t on, uint16_t off) {
@@ -77,7 +90,7 @@ void Adafruit_PWMServoDriver::setPWM(uint8_t num, uint16_t on, uint16_t off) {
   WIRE.write(on>>8);
   WIRE.write(off);
   WIRE.write(off>>8);
-  WIRE.endTransmission();
+  lastStatus=WIRE.endTransmission();
 }
 
 // Sets pin without having to deal with on/off tick placement and properly handles
@@ -118,8 +131,7 @@ void Adafruit_PWMServoDriver::setPin(uint8_t num, uint16_t val, bool invert)
 uint8_t Adafruit_PWMServoDriver::read8(uint8_t addr) {
   WIRE.beginTransmission(_i2caddr);
   WIRE.write(addr);
-  WIRE.endTransmission();
-
+  lastStatus=WIRE.endTransmission();
   WIRE.requestFrom((uint8_t)_i2caddr, (uint8_t)1);
   return WIRE.read();
 }
@@ -128,5 +140,5 @@ void Adafruit_PWMServoDriver::write8(uint8_t addr, uint8_t d) {
   WIRE.beginTransmission(_i2caddr);
   WIRE.write(addr);
   WIRE.write(d);
-  WIRE.endTransmission();
+  lastStatus=WIRE.endTransmission();
 }

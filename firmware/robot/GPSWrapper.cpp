@@ -27,6 +27,7 @@ String GPSWrapper::getLastError(){//Returns the last error that occured (string)
 }
 
 String GPSWrapper::getErrorCount(){ //Returns the number of errors that have occured since the program start or since clearErrors() was called (String)
+  errorCount=errorCount%10000000;//use the remainder to limit the size of the number. The effect is that it'll rollover when it gets too big.
   String count=String(errorCount,DEC);//Convert from number to string
   return count;                       //Return the string
 }
@@ -65,7 +66,7 @@ String GPSWrapper::getAltitude(){//If there is a fix, returns the altitude in me
     else{return String(GPS.altitude,1)+String(" meters");}
 }
 
-String GPSWrapper::getTime(){                   //returns the time in “HH:MM:SS.SSS UTC” Time is UTC, not timezone or daylight saving offset.
+String GPSWrapper::getTime(){                   //returns the time in "HH:MM:SS.SSS UTC" Time is UTC, not timezone or daylight saving offset.
   parse();//looks for new sentence from the GPS and parses it
   String Time="";                               //make a blank string
   if(GPS.hour<10){Time.concat("0");}            //add a "0" if there is less than 10 hours
@@ -84,9 +85,9 @@ String GPSWrapper::getTime(){                   //returns the time in “HH:MM:S
   return Time;                                  //return formatted time
 }
 
-String GPSWrapper::getDate(){                   //returns date in “YYYY-MM-DD” format
+String GPSWrapper::getDate(){                   //returns date in "YYYY-MM-DD" format
   parse();//looks for new sentence from the GPS and parses it
-  return String("20")+String(GPS.year)+String("-")+String(GPS.month)+String("-")+String(GPS.day); //return date in “YYYY-MM-DD” format
+  return String("20")+String(GPS.year)+String("-")+String(GPS.month)+String("-")+String(GPS.day); //return date in "YYYY-MM-DD" format
 }
 
 String GPSWrapper::getFix(){                                            //returns "No fix" "Bad fix" "Good fix" or "Great fix" based on fix and quality
@@ -102,3 +103,4 @@ String GPSWrapper::getSatelliteCount(){     //returns the number of satellites a
   parse();//looks for new sentence from the GPS and parses it
   return String(GPS.satellites);          //return the number of satellites available in a string
 }
+

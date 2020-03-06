@@ -1,6 +1,7 @@
 #include "RadioWrapperRelay.h"
 #include "src/MemoryFree/MemoryFree.h"//Serial.println(freeMemory());//see how much free ram is left in bytes. If this becomes zero then bad things happen. 
 
+String VERSION="RL.0.1.2";
 RadioWrapperRelay Radio;//radio object enables wireless communication
 
 void setup(){
@@ -9,7 +10,7 @@ void setup(){
 }
 
 void loop(){
-  String responseFromRadio=Radio.receive();//get response from radio
+  String responseFromRadio=Radio.receive().c_str();//get response from radio
   if(responseFromRadio!="No Response Received"){//if there is a response,
     Serial.print(responseFromRadio+'\n');  //relay it to the computer through the serial port
   }
@@ -86,7 +87,7 @@ void parse(String command){
       command.remove(0,String("System ").length());//remove the first word of the command
       if(command.length()==0)                      {Serial.print("Usage: 'Relay System [ping/getVersion/getAvailableMemory]'\n");return;}
       if(firstWordOf(command,"ping"))              {Serial.print("pong\n");return;}
-      if(firstWordOf(command,"getVersion"))        {Serial.print("V1.1\n");return;}
+      if(firstWordOf(command,"getVersion"))        {Serial.print(VERSION+"\n");return;}
       if(firstWordOf(command,"getAvailableMemory")){Serial.print(String(freeMemory())+'\n');return;}
       Serial.print("Unrecognised Command: '"+command+"'\n");return;
     }
@@ -94,7 +95,7 @@ void parse(String command){
   }
   if(firstWordOf(command,"Robot")){//if the first word of command is "Robot"
     command.remove(0,String("Robot ").length());//remove the first word of the command
-    if(command.length()==0)                        {Serial.print("Usage: 'Robot [Radio/Audio/GPS/Servo/Display/Battery/Sensor/System]'\n");return;}
+    if(command.length()==0)                        {Serial.print("Usage: 'Robot [Radio/Audio/GPS/Servo/Display/Battery/Sensor/FRAM/System]'\n");return;}
     if(firstWordOf(command,"Radio")){//if the first word of command is "Radio"
       command.remove(0,String("Radio ").length());//remove the first word of the command
       if(command.length()==0)                        {Serial.print("Usage: 'Robot Radio [clearErrors/getLastError/getErrorCount/getSignalStrength/getTemperature]'\n");return;}
@@ -148,14 +149,16 @@ void parse(String command){
     }
     if(firstWordOf(command,"Servo")){//if the first word of command is "Servo"
       command.remove(0,String("Servo ").length());//remove the first word of the command
-      if(command.length()==0)                        {Serial.print("Usage: 'Robot Servo [clearErrors/getLastError/getErrorCount/0/1/2/3/4/5/6/7]'\n");return;}
+      if(command.length()==0)                        {Serial.print("Usage: 'Robot Servo [clearErrors/getLastError/getErrorCount/getVoltage/0/1/2/3/4/5/6/7]'\n");return;}
       if(firstWordOf(command,"clearErrors"))         {Radio.send("Servo clearErrors");return;}
       if(firstWordOf(command,"getLastError"))        {Radio.send("Servo getLastError");return;}
       if(firstWordOf(command,"getErrorCount"))       {Radio.send("Servo getErrorCount");return;}
+      if(firstWordOf(command,"getVoltage"))          {Radio.send("Servo getVoltage");return;}
       if(firstWordOf(command,"0")){
         command.remove(0,String("0 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 0 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 0 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 0 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 0 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 0 setAngle <angle>'\n");return;}
@@ -165,8 +168,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"1")){
         command.remove(0,String("1 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 1 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 1 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 1 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 1 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 1 setAngle <angle>'\n");return;}
@@ -176,8 +180,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"2")){
         command.remove(0,String("2 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 2 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 2 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 2 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 2 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 2 setAngle <angle>'\n");return;}
@@ -187,8 +192,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"3")){
         command.remove(0,String("3 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 3 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 3 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 3 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 3 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 3 setAngle <angle>'\n");return;}
@@ -198,8 +204,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"4")){
         command.remove(0,String("4 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 4 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 4 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 4 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 4 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 4 setAngle <angle>'\n");return;}
@@ -209,8 +216,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"5")){
         command.remove(0,String("5 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 5 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 5 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 5 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 5 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 5 setAngle <angle>'\n");return;}
@@ -220,8 +228,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"6")){
         command.remove(0,String("6 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 6 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 6 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 6 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 6 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 6 setAngle <angle>'\n");return;}
@@ -231,8 +240,9 @@ void parse(String command){
       }
       if(firstWordOf(command,"7")){
         command.remove(0,String("7 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 7 [setAngle/getAngle]'\n");return;}
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Servo 7 [setAngle/getAngle/goLimp]'\n");return;}
         if(firstWordOf(command,"getAngle"))          {Radio.send("Servo 7 getAngle");return;}
+        if(firstWordOf(command,"goLimp"))            {Radio.send("Servo 7 goLimp");return;}
         if(firstWordOf(command,"setAngle")){
           command.remove(0,String("setAngle ").length());//remove the first word of the command
           if(command.length()==0)                    {Serial.print("Usage: 'Robot Servo 7 setAngle <angle>'\n");return;}
@@ -244,63 +254,126 @@ void parse(String command){
     }
     if(firstWordOf(command,"Display")){//if the first word of command is "Display"
       command.remove(0,String("Display ").length());//remove the first word of the command
-      if(command.length()==0)                        {Serial.print("Usage: 'Robot Display [clearErrors/getLastError/getErrorCount/Line1/Line2/Line3/clear/turnOn/turnOff/getState]'\n");return;}
+      if(command.length()==0)                        {Serial.print("Usage: 'Robot Display [clearErrors/getLastError/getErrorCount/getUpdateCount/show/hide/isShowing/setText/getText]'\n");return;}
       if(firstWordOf(command,"clearErrors"))         {Radio.send("Display clearErrors");return;}
       if(firstWordOf(command,"getLastError"))        {Radio.send("Display getLastError");return;}
       if(firstWordOf(command,"getErrorCount"))       {Radio.send("Display getErrorCount");return;}
-      if(firstWordOf(command,"clear"))               {Radio.send("Display clear");return;}
-      if(firstWordOf(command,"turnOn"))              {Radio.send("Display turnOn");return;}
-      if(firstWordOf(command,"turnOff"))             {Radio.send("Display turnOff");return;}
-      if(firstWordOf(command,"getState"))            {Radio.send("Display getState");return;}
-      if(firstWordOf(command,"Line1")){
-        command.remove(0,String("Line1 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display Line1 [getText/setText]'\n");return;}
-        if(firstWordOf(command,"getText"))           {Radio.send("Display Line1 getText");return;}
-        if(firstWordOf(command,"setText")){
-          command.remove(0,String("setText ").length());//remove the first word of the command
-          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display Line1 setText <text>'\n");return;}
-          Radio.send("Display Line1 setText "+command);return;
+      if(firstWordOf(command,"getUpdateCount"))      {Radio.send("Display getUpdateCount");return;}
+      if(firstWordOf(command,"show")){
+        command.remove(0,String("show ").length());//remove the first word of the command
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display show [all/title/loopCount/commandCount/totalErrorCount/line0/line1/line2/line3/signal/battery/volume/timeout]'\n");return;}
+        if(firstWordOf(command,"all"))               {Radio.send("Display show all");return;}
+        if(firstWordOf(command,"title"))             {Radio.send("Display show title");return;}
+        if(firstWordOf(command,"loopCount"))         {Radio.send("Display show loopCount");return;}
+        if(firstWordOf(command,"commandCount"))      {Radio.send("Display show commandCount");return;}
+        if(firstWordOf(command,"totalErrorCount"))   {Radio.send("Display show totalErrorCount");return;}
+        if(firstWordOf(command,"line0"))             {Radio.send("Display show line0");return;}
+        if(firstWordOf(command,"line1"))             {Radio.send("Display show line1");return;}
+        if(firstWordOf(command,"line2"))             {Radio.send("Display show line2");return;}
+        if(firstWordOf(command,"line3"))             {Radio.send("Display show line3");return;}
+        if(firstWordOf(command,"signal"))            {Radio.send("Display show signal");return;}
+        if(firstWordOf(command,"battery"))           {Radio.send("Display show battery");return;}
+        if(firstWordOf(command,"volume"))            {Radio.send("Display show volume");return;}
+        if(firstWordOf(command,"timeout"))           {Radio.send("Display show timeout");return;}
+        Serial.print("Unrecognised Command: '"+command+"'\n");return;
+      }
+      if(firstWordOf(command,"hide")){
+        command.remove(0,String("hide ").length());//remove the first word of the command
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display hide [all/title/loopCount/commandCount/totalErrorCount/line0/line1/line2/line3/signal/battery/volume/timeout]'\n");return;}
+        if(firstWordOf(command,"all"))               {Radio.send("Display hide all");return;}
+        if(firstWordOf(command,"title"))             {Radio.send("Display hide title");return;}
+        if(firstWordOf(command,"loopCount"))         {Radio.send("Display hide loopCount");return;}
+        if(firstWordOf(command,"commandCount"))      {Radio.send("Display hide commandCount");return;}
+        if(firstWordOf(command,"totalErrorCount"))   {Radio.send("Display hide totalErrorCount");return;}
+        if(firstWordOf(command,"line0"))             {Radio.send("Display hide line0");return;}
+        if(firstWordOf(command,"line1"))             {Radio.send("Display hide line1");return;}
+        if(firstWordOf(command,"line2"))             {Radio.send("Display hide line2");return;}
+        if(firstWordOf(command,"line3"))             {Radio.send("Display hide line3");return;}
+        if(firstWordOf(command,"signal"))            {Radio.send("Display hide signal");return;}
+        if(firstWordOf(command,"battery"))           {Radio.send("Display hide battery");return;}
+        if(firstWordOf(command,"volume"))            {Radio.send("Display hide volume");return;}
+        if(firstWordOf(command,"timeout"))           {Radio.send("Display hide timeout");return;}
+        Serial.print("Unrecognised Command: '"+command+"'\n");return;
+      }
+      if(firstWordOf(command,"isShowing")){
+        command.remove(0,String("isShowing ").length());//remove the first word of the command
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display isShowing [title/loopCount/commandCount/totalErrorCount/line0/line1/line2/line3/signal/battery/volume/timeout]'\n");return;}
+        if(firstWordOf(command,"title"))             {Radio.send("Display isShowing title");return;}
+        if(firstWordOf(command,"loopCount"))         {Radio.send("Display isShowing loopCount");return;}
+        if(firstWordOf(command,"commandCount"))      {Radio.send("Display isShowing commandCount");return;}
+        if(firstWordOf(command,"totalErrorCount"))   {Radio.send("Display isShowing totalErrorCount");return;}
+        if(firstWordOf(command,"line0"))             {Radio.send("Display isShowing line0");return;}
+        if(firstWordOf(command,"line1"))             {Radio.send("Display isShowing line1");return;}
+        if(firstWordOf(command,"line2"))             {Radio.send("Display isShowing line2");return;}
+        if(firstWordOf(command,"line3"))             {Radio.send("Display isShowing line3");return;}
+        if(firstWordOf(command,"signal"))            {Radio.send("Display isShowing signal");return;}
+        if(firstWordOf(command,"battery"))           {Radio.send("Display isShowing battery");return;}
+        if(firstWordOf(command,"volume"))            {Radio.send("Display isShowing volume");return;}
+        if(firstWordOf(command,"timeout"))           {Radio.send("Display isShowing timeout");return;}
+        Serial.print("Unrecognised Command: '"+command+"'\n");return;
+      }
+      if(firstWordOf(command,"setText")){
+        command.remove(0,String("setText ").length());//remove the first word of the command
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display setText [line0/line1/line2/line3]'\n");return;}
+        if(firstWordOf(command,"line0")){
+          command.remove(0,String("line0 ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display setText line0 <text>'\n");return;}
+          Radio.send("Display setText line0 "+command);return;
+        }
+        if(firstWordOf(command,"line1")){
+          command.remove(0,String("line1 ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display setText line1 <text>'\n");return;}
+          Radio.send("Display setText line1 "+command);return;
+        }
+        if(firstWordOf(command,"line2")){
+          command.remove(0,String("line2 ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display setText line2 <text>'\n");return;}
+          Radio.send("Display setText line2 "+command);return;
+        }
+        if(firstWordOf(command,"line3")){
+          command.remove(0,String("line3 ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display setText line3 <text>'\n");return;}
+          Radio.send("Display setText line3 "+command);return;
         }
         Serial.print("Unrecognised Command: '"+command+"'\n");return;
       }
-      if(firstWordOf(command,"Line2")){
-        command.remove(0,String("Line2 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display Line2 [getText/setText]'\n");return;}
-        if(firstWordOf(command,"getText"))           {Radio.send("Display Line2 getText");return;}
-        if(firstWordOf(command,"setText")){
-          command.remove(0,String("setText ").length());//remove the first word of the command
-          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display Line2 setText <text>'\n");return;}
-          Radio.send("Display Line2 setText "+command);return;
-        }
-        Serial.print("Unrecognised Command: '"+command+"'\n");return;
-      }
-      if(firstWordOf(command,"Line3")){
-        command.remove(0,String("Line3 ").length());//remove the first word of the command
-        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display Line3 [getText/setText]'\n");return;}
-        if(firstWordOf(command,"getText"))           {Radio.send("Display Line3 getText");return;}
-        if(firstWordOf(command,"setText")){
-          command.remove(0,String("setText ").length());//remove the first word of the command
-          if(command.length()==0)                    {Serial.print("Usage: 'Robot Display Line3 setText <text>'\n");return;}
-          Radio.send("Display Line3 setText "+command);return;
-        }
+      if(firstWordOf(command,"getText")){
+        command.remove(0,String("getText ").length());//remove the first word of the command
+        if(command.length()==0)                      {Serial.print("Usage: 'Robot Display getText [line0/line1/line2/line3]'\n");return;}
+        if(firstWordOf(command,"line0"))             {Radio.send("Display getText line0");return;}
+        if(firstWordOf(command,"line1"))             {Radio.send("Display getText line1");return;}
+        if(firstWordOf(command,"line2"))             {Radio.send("Display getText line2");return;}
+        if(firstWordOf(command,"line3"))             {Radio.send("Display getText line3");return;}
         Serial.print("Unrecognised Command: '"+command+"'\n");return;
       }
       Serial.print("Unrecognised Command: '"+command+"'\n");return;
     }
     if(firstWordOf(command,"Battery")){//if the first word of command is "Battery"
       command.remove(0,String("Battery ").length());//remove the first word of the command
-      if(command.length()==0)                        {Serial.print("Usage: 'Robot Battery [clearErrors/getLastError/getErrorCount/getVoltage/getCharge/getCurrent/getPower/getCapacity/isCharging]'\n");return;}
+      if(command.length()==0)                        {Serial.print("Usage: 'Robot Battery [clearErrors/getLastError/getErrorCount/getVoltage/getCharge/getHealth/getCurrent/getPower/getCapacity/isCharging/getMinimum/setMinimum/setMaxCapacity]'\n");return;}
       if(firstWordOf(command,"clearErrors"))         {Radio.send("Battery clearErrors");return;}
       if(firstWordOf(command,"getLastError"))        {Radio.send("Battery getLastError");return;}
       if(firstWordOf(command,"getErrorCount"))       {Radio.send("Battery getErrorCount");return;}
       if(firstWordOf(command,"getVoltage"))          {Radio.send("Battery getVoltage");return;}
       if(firstWordOf(command,"getCharge"))           {Radio.send("Battery getCharge");return;}
+      if(firstWordOf(command,"getHealth"))           {Radio.send("Battery getHealth");return;}
       if(firstWordOf(command,"getCurrent"))          {Radio.send("Battery getCurrent");return;}
       if(firstWordOf(command,"getPower"))            {Radio.send("Battery getPower");return;}
       if(firstWordOf(command,"getCapacity"))         {Radio.send("Battery getCapacity");return;}
       if(firstWordOf(command,"isCharging"))          {Radio.send("Battery isCharging");return;}
-      Serial.print("Unrecognised Command: '"+command+"'\n");return;
-    }
+      if(firstWordOf(command,"getMinimum"))          {Radio.send("Battery getMinimum");return;}
+      if(firstWordOf(command,"setMaxCapacity")){
+        command.remove(0,String("setMaxCapacity ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Battery setMaxCapacity <Capacity>'\n");return;}
+          Radio.send("Battery setMaxCapacity "+command);return;
+        }
+      if(firstWordOf(command,"setMinimum")){
+        command.remove(0,String("setMinimum ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot Battery setMinimum <BatteryLevel>'\n");return;}
+          Radio.send("Battery setMinimum "+command);return;
+        }
+        Serial.print("Unrecognised Command: '"+command+"'\n");return;
+      }
     if(firstWordOf(command,"Sensor")){//if the first word of command is "Sensor"
       command.remove(0,String("Sensor ").length());//remove the first word of the command
       if(command.length()==0)                        {Serial.print("Usage: 'Robot Sensor [clearErrors/getLastError/getErrorCount/getTemperature/getPressure/getHumidity]'\n");return;}
@@ -312,20 +385,36 @@ void parse(String command){
       if(firstWordOf(command,"getHumidity"))         {Radio.send("Sensor getHumidity");return;}
       Serial.print("Unrecognised Command: '"+command+"'\n");return;
     }
+    if(firstWordOf(command,"FRAM")){//if the first word of command is "FRAM"
+      command.remove(0,String("FRAM ").length());//remove the first word of the command
+      if(command.length()==0)                        {Serial.print("Usage: 'Robot FRAM [clearErrors/getLastError/getErrorCount/getData/clearData]'\n");return;}
+      if(firstWordOf(command,"clearErrors"))         {Radio.send("FRAM clearErrors");return;}
+      if(firstWordOf(command,"getLastError"))        {Radio.send("FRAM getLastError");return;}
+      if(firstWordOf(command,"getErrorCount"))       {Radio.send("FRAM getErrorCount");return;}
+      if(firstWordOf(command,"getData")){
+        command.remove(0,String("getData ").length());//remove the first word of the command
+          if(command.length()==0)                    {Serial.print("Usage: 'Robot FRAM getData <Address>'\n");return;}
+          Radio.send("FRAM getData "+command);return;
+        }
+       if(firstWordOf(command,"clearData"))          {Radio.send("FRAM clearData");return;}
+        Serial.print("Unrecognised Command: '"+command+"'\n");return;
+      }
     if(firstWordOf(command,"System")){//if the first word of command is "Sensor"
       command.remove(0,String("System ").length());//remove the first word of the command
-      if(command.length()==0)                        {Serial.print("Usage: 'Robot System [wakeUp/goToSleep/restart/getAvailableMemory/getVersion/ping]'\n");return;}
-      if(firstWordOf(command,"wakeUp"))              {Radio.send("System wakeUp");return;}
-      if(firstWordOf(command,"goToSleep"))           {Radio.send("System goToSleep");return;}
+      if(command.length()==0)                        {Serial.print("Usage: 'Robot System [restart/goToSleep/wakeUp/getAvailableMemory/getVersion/getTimeLeft/forceCrash/shutDown/ping]'\n");return;}
       if(firstWordOf(command,"restart"))             {Radio.send("System restart");return;}
+      if(firstWordOf(command,"goToSleep"))           {Radio.send("System goToSleep");return;}
+      if(firstWordOf(command,"wakeUp"))              {Radio.send("System wakeUp");return;}
       if(firstWordOf(command,"getAvailableMemory"))  {Radio.send("System getAvailableMemory");return;}
       if(firstWordOf(command,"getVersion"))          {Radio.send("System getVersion");return;}
+      if(firstWordOf(command,"shutDown"))            {Radio.send("System shutDown");return;}
+      if(firstWordOf(command,"forceCrash"))          {Radio.send("System forceCrash");return;}
       if(firstWordOf(command,"ping"))                {Radio.send("System ping");return;}
+      if(firstWordOf(command,"getTimeLeft"))         {Radio.send("System getTimeLeft");return;}
       Serial.print("Unrecognised Command: '"+command+"'\n");return;
     }
     Serial.print("Unrecognised Command: '"+command+"'\n");return;
   }
-  if(firstWordOf(command,"Help"))                    {Serial.print("go to www.goo.gl/7wdcSH for commands. Incomplete commands will give usage suggestions. Try 'Robot' or 'Relay'\n");return;}//if the first word of command is "Help"
-  if(firstWordOf(command,"?"))                       {Serial.print("go to www.goo.gl/7wdcSH for commands. Incomplete commands will give usage suggestions. Try 'Robot' or 'Relay'\n");return;}//if the first word of command is "?"  
-  Serial.print("Unrecognised Command: '"+command+"'\n");return;
-}
+  if(firstWordOf(command,"Help"))                    {Serial.print("go to www.goo.gl/7wdcSH for commands. Incomplete commands will give usage suggestions. Try 'Robot' or 'Relay'\n");return;} //if the first word of command is "Help"
+  if(firstWordOf(command,"?"))                       {Serial.print("go to www.goo.gl/7wdcSH for commands. Incomplete commands will give usage suggestions. Try 'Robot' or 'Relay'\n");return;} //if the first word of command is "?"  
+  Serial.print("Unrecognised Command: '"+command+"'\n");return;}
