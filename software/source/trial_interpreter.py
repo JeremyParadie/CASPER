@@ -152,3 +152,28 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
         # TODO
         # Note this is not comm sendable
         # Adds the list of comm sendable functions that would create the intended motion to the stack then does runNextLine
+
+def loop(que):
+    """
+    desc: the loop used to manage talking to the trial interpreter.
+    possible commands:
+        'Trial.start' -> TODO define
+        'Trial.end' -> closes the open log file for the current trial, and stops trial
+    ;
+    """
+    current_trial = Trial();
+
+    if que[0].startswith('Trial'):
+        # fetch the message from the top of the que
+        addr, retaddr, args  = que.pop(0)
+        # parse the adress into just the command by spitiling and disposing
+        # of the first item. the cmd is the adress minus the module name
+        cmd = addr.split('.')[1:]
+        cmd_type = cmd[0] # convieneient for below
+
+        if cmd_type == 'start':
+
+        elif cmd_type == 'end':
+
+        else:
+            #error command not found
