@@ -1,5 +1,5 @@
-import logger
 import os
+import csv
 
 #TODO Recieve Commands:
 #Trial.load
@@ -21,6 +21,15 @@ import os
 # If you wish too add new methods they should either return a string that the comms support as a command, or push a sequence of
 #supported methods onto the exec stack that create the desired behavior
 
+class Logger:
+
+	def __init__(self, csvFile):
+		self.log = open(csvFile, 'w')
+		self.writer = csv.writer(self.log, delimiter=',')
+
+	def write(self, time, event):
+		self.writer.writerow([time, event])
+
 class Trial: # this will be an instance of a trial, re-instantiated for each new trial
 
     def __init__(self, name="Default_Trial", trial=["tailSetAngle(50, 1)", "tailSetAngle(20, 1.5)", "tailSetAngle(50, 2)", "tailSetAngle(20, 2.5)", "tailSetAngle(50, 3)", "tailSetAngle(20, 3.5)", "tailSetAngle(50, 4)", "tailSetAngle(20, 4.5)", "tailSetAngle(50, 5)", "tailSetAngle(20, 5.5)", "tailSetAngle(-20, 6)", "audioPlay('track004.mp3', 7)", "audioStop(30)"], DEBUG=False):
@@ -34,7 +43,7 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
         while (csvExists == True):
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
-        self.logger = logger.Logger("logs/" + name + str(i) + ".csv")
+        self.logger = Logger("logs/" + name + str(i) + ".csv")
 
     def getName(self):
         return self.name
