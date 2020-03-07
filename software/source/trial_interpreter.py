@@ -176,7 +176,7 @@ def loop(que):
         # fetch the message from the top of the que
         addr, retaddr, args  = que.pop(0)
         # parse the adress into just the command by spitiling and disposing
-        # of the first item. the cmd is the adress minus the module name
+        # of the first item. the cmd is the address minus the module name
         cmd = addr.split('.')[1:]
         cmd_type = cmd[0] # convieneient for below
 
@@ -185,7 +185,9 @@ def loop(que):
                 current_trial = Trial(args[0], args[1], args[2])
             else:
                 current_trial = Trial(args[0], args[1])
+            que.append( (retaddr, None, current_trial.popAllLines()) )
 
+            
         elif cmd_type == 'end':
             current_trial.logger.log.close()
         else:
