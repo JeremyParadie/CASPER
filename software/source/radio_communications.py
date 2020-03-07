@@ -6,6 +6,7 @@ Author: Per Van Dyke
 import serial
 import queue
 import time
+from example_commands import examples
 
 def function_to_auto_scan_for_port():
     ...
@@ -22,9 +23,8 @@ def wait_scan(duration):
 #setup classes
 class Radio():
 
-    def __init__(self, port, baudrate=9600, timeout=0, Q):
+    def __init__(self, port, baudrate=9600, timeout=0):
         self.serial_port = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
-        commsLoop(Q)
 
     #Takes one argument (The string to be sent), adds a newline, and encodes/sends it.
     def send(self, command):
@@ -35,7 +35,7 @@ class Radio():
         if not command.endswith('\n'):
             command += '\n'
 
-        print("command sent to robot: '"+command+"'")
+        #print("command sent to robot: '"+command+"'")
 
         #ensure command is compaitlbe with the serial_port
         command = command.encode('utf-8')
@@ -67,6 +67,13 @@ class Radio():
 
         return response
 
+class FakeRadio():
+
+    def send():
+
+    def receive():
+
+
 def loop(que):
     """
     desc: the loop used to manage talking to the radio.
@@ -84,43 +91,31 @@ def loop(que):
     port = function_to_auto_scan_for_port()
     radio = Radio()
 
-    # if the que's first message is adressed to radio (may implememnt total loop through later)
-    if que[0].startswith('radio'):
-        # fetch the message from the top of the que
-        addr, retaddr, args  = que.pop(0)
-        # parse the adress into just the command by spitiling and disposing
-        # of the first item. the cmd is the adress minus the module name
-        cmd = addr.split('.')[1:]
-        cmd_type = cmd[0] # convieneient for below
+    while True:
+        # if the que's first message is adressed to radio (may implememnt total loop through later)
+        if que[0].startswith('radio'):
+            # fetch the message from the top of the que
+            addr, retaddr, args  = que.pop(0)
+            # parse the adress into just the command by spitiling and disposing
+            # of the first item. the cmd is the adress minus the module name
+            cmd = addr.split('.')[1:]
+            cmd_type = cmd[0] # convieneient for below
 
-        # check each option for a cmd_type and exexcute the coresponding code (then respond)
-        if cmd_type == 'robot' or cmd_type == 'relay':
-            # the first item of args should always be the message to send to the robot
-            radio.send(f"{cmd_type} {args[0]}")
+            # check each option for a cmd_type and exexcute the coresponding code (then respond)
+            if cmd_type == 'robot' or cmd_type == 'relay':
+                # the first item of args should always be the message to send to the robot
+                radio.send(f"{cmd_type} {args[0]}")
 
-            # here will need to cahgned to be non-vlocking and scan the
-            # message que (for now that will be omitted to make the data flow more clear)
+                # here will need to cahgned to be non-vlocking and scan the
+                # message que (for now that will be omitted to make the data flow more clear)
 
-            # try to fetcha responce, otherwise don't send  responce
-            # (this might change depending on how we think the system sould behave)
-            try:
-                responce = radio.receive()
-            except:
-                continue
+                # try to fetcha responce, otherwise don't send  responce
+                # (this might change depending on how we think the system sould behave)
+                try:
+                    responce = radio.receive()
+                except:
+                    continue
 
-            # append the responce to the message into the queue
-            if retaddr is not None:
-                que.append( (retaddr, None, responce) )
-
-        elif cmd_type == 'example_command':
-            # this is an example of another command (in a ctiallity the radio
-            #   commands will require no sub-adressing)
-            pass# que.append('temp responce')
-        elif cmd_type == 'nesting_argument':
-            sub_cmd = cmd[1]
-            if sub_cmd == 'option1':
-                pass # execute option 1
-                # que.append('temp responce')
-            elif sub_cmd == 'option2':
-                pass # execute option 2
-                # que.append('temp responce')
+                # append the responce to the message into the queue
+                if retaddr is not None:
+                    que.append( (retaddr, None, responce) )

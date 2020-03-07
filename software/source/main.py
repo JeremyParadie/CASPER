@@ -38,7 +38,7 @@ threads.append(ti_thread)
 
 
 ### define main task threads resources and loop ###
-
+#this is pretending to be a loop
 def loop(que):
     """
     desc: the loop used to onitor the message_que for exit commands;
