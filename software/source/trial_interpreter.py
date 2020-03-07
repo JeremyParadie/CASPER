@@ -30,13 +30,14 @@ class Logger:
 	def write(self, time, event):
 		self.writer.writerow([time, event])
 
+# TODO arg 1 is name, arg 2 is a py file with the trial code, and arg 3 is a py file with commands that should be usable in arg 2
 class Trial: # this will be an instance of a trial, re-instantiated for each new trial
 
-    def __init__(self, name="Default_Trial", trial=["tailSetAngle(50, 1)", "tailSetAngle(20, 1.5)", "tailSetAngle(50, 2)", "tailSetAngle(20, 2.5)", "tailSetAngle(50, 3)", "tailSetAngle(20, 3.5)", "tailSetAngle(50, 4)", "tailSetAngle(20, 4.5)", "tailSetAngle(50, 5)", "tailSetAngle(20, 5.5)", "tailSetAngle(-20, 6)", "audioPlay('track004.mp3', 7)", "audioStop(30)"], DEBUG=False):
+    def __init__(self, name="Default_Trial", trial=["tailSetAngle(50, 1)", "tailSetAngle(20, 1.5)", "tailSetAngle(50, 2)", "tailSetAngle(20, 2.5)", "tailSetAngle(50, 3)", "tailSetAngle(20, 3.5)", "tailSetAngle(50, 4)", "tailSetAngle(20, 4.5)", "tailSetAngle(50, 5)", "tailSetAngle(20, 5.5)", "tailSetAngle(-20, 6)", "audioPlay('track004.mp3', 7)", "audioStop(30)"], robot=""):
         self.name = name
         self.execStack = list(
             map(lambda n: "self.lastOutput = Trial." + n, trial))
-        self._DEBUG = DEBUG
+        self.robot = robot # loop over all the function definitions in this py file so that arg 2 can use it
         self.lastOutput = None
         i = 0
         csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
@@ -166,13 +167,13 @@ def loop(que):
     """
     desc: the loop used to manage talking to the trial interpreter.
     possible commands:
-        'Trial.start' -> TODO define
-        'Trial.end' -> closes the open log file for the current trial, and stops trial
+        'trial.start' -> TODO define
+        'trial.end' -> closes the open log file for the current trial, and stops trial
     ;
     """
     current_trial = Trial();
 
-    if que[0].startswith('Trial'):
+    if que[0].startswith('trial'):
         # fetch the message from the top of the que
         addr, retaddr, args  = que.pop(0)
         # parse the adress into just the command by spitiling and disposing
@@ -181,10 +182,8 @@ def loop(que):
         cmd_type = cmd[0] # convieneient for below
 
         if cmd_type == 'start':
-            if len(args) == 3:
-                current_trial = Trial(args[0], args[1], args[2])
-            else:
-                current_trial = Trial(args[0], args[1])
+            current_trial = Trial(args[0], args[1], arg[2])
+
             que.append( (retaddr, None, current_trial.popAllLines()) )
 
             
