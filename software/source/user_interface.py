@@ -1,18 +1,30 @@
+"""
+The Actual User interface for the CASPER Robot. 
+Controls UI appearence, Importing of buttons, and importing of data fields.
+
+Author: Per Van Dyke
+"""
+
+
+
 import sys
 import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-row_length = 5
 
-# Subclass QMainWindow to customise your application's main window
+row_length = 5
+input_height = 30
+UI_active = False
+
+# Class containing all code for the main window
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
-        infoDialog = UserWindow(self)
-        infoDialog.exec_()
+        info_dialog = UserWindow(self)
+        info_dialog.exec_()
 
         self.SetupWindow()
         
@@ -48,7 +60,7 @@ class MainWindow(QMainWindow):
         consoleLayout.addWidget(self.consoleLog)
 
         self.console = QTextEdit()
-        self.console.setMaximumHeight(25)
+        self.console.setMaximumHeight(input_height)
         #self.console.
         consoleLayout.addWidget(self.console)
 
@@ -64,14 +76,7 @@ class MainWindow(QMainWindow):
         print(selectedJSON[0])
         with open(selectedJSON[0]) as json_file:
             buttons = json.load(json_file)
-        '''button_holder0 = QHBoxLayout()
-        button_holder1 = QHBoxLayout()
-        button_holder2 = QHBoxLayout()
-        button_holder3 = QHBoxLayout()
-        button_holder4 = QHBoxLayout()
-        button_holder5 = QHBoxLayout()
-        button_holder6 = QHBoxLayout()
-        button_holder_list = [button_holder0, button_holder1, button_holder2, button_holder3, button_holder4, button_holder5, button_holder6]'''
+
         button_holder_list = []
         for _ in range(((len(buttons["button_list"])//row_length)+1)):
             button_holder_list.append(QHBoxLayout())
@@ -134,17 +139,17 @@ class UserWindow(QDialog):
 
         # Create the various buttons and assign them to proper rows
         observer = QTextEdit()
-        observer.setFixedHeight(25)
+        observer.setFixedHeight(input_height)
         observer.setPlaceholderText("Observer")
         hLayout1.addWidget(observer)
 
         recorder = QTextEdit()
-        recorder.setFixedHeight(25)
+        recorder.setFixedHeight(input_height)
         recorder.setPlaceholderText("Recorder")
         hLayout1.addWidget(recorder)
 
         videoPerson = QTextEdit()
-        videoPerson.setFixedHeight(25)
+        videoPerson.setFixedHeight(input_height)
         videoPerson.setPlaceholderText("Video Person")
         hLayout1.addWidget(videoPerson)
 
@@ -152,7 +157,7 @@ class UserWindow(QDialog):
         hLayout2.addWidget(date)
 
         location = QTextEdit()
-        location.setFixedHeight(25)
+        location.setFixedHeight(input_height)
         location.setPlaceholderText("Location")
         hLayout2.addWidget(location)
 
@@ -164,6 +169,26 @@ class UserWindow(QDialog):
 
     def SubmitData(self):
         self.close()
+
+def loop(que):
+
+    while True:
+        if not UI_active:
+            app = QApplication(sys.argv)
+
+            window = MainWindow()
+            window.show()
+
+            app.exec_()
+
+        #if the que's first message is adressed to main (may implememnt total loop through later)
+        if que[0].startswith('UI'):
+            # fetch the message from the top of the que
+            addr, retaddr, args  = que.pop(0)
+            # parse the adress into just the command by spitiling and disposing
+            # of the first item
+            cmd = addr.split('.')[1:]
+
 
 
 if __name__ == "__main__":
