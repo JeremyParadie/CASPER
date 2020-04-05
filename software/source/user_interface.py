@@ -12,6 +12,7 @@ import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from pathlib import Path
 
 row_length = 5
 input_height = 30
@@ -22,9 +23,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        
-        info_dialog = UserWindow(self)
-        info_dialog.exec_()
+
+        self.defaults = {}
+        self.robot_fields = {}
 
         self.SetupWindow()
         
@@ -32,15 +33,96 @@ class MainWindow(QMainWindow):
         
     def SetupWindow(self):
         self.setWindowTitle("CASPER")
-        
+
         self.mainColumn = QVBoxLayout()
 
         upperButtons = QHBoxLayout()
         upperButtons.setSpacing(500)
         self.mainColumn.addLayout(upperButtons)
 
+        self.left_pane = QVBoxLayout()
+        self.right_pane = QVBoxLayout()
+        self.pane_wrapper = QHBoxLayout()
+        self.mainColumn.addLayout(self.pane_wrapper)
+        self.pane_wrapper.addLayout(self.left_pane)
+        self.pane_wrapper.addLayout(self.right_pane)
+
+        # Constant fields for left_pane
+
+        # Robot Selection
+        robot_label_box = QVBoxLayout()
+        robot_button_box = QHBoxLayout()
+        
+        robot_label = QLabel("Robot")
+        
+        self.robot_path = QTextEdit()
+        self.robot_path.setReadOnly(True)
+        self.robot_path.setMinimumHeight(input_height)
+        self.robot_path.setMaximumHeight(input_height)
+        self.robot_path.setMinimumWidth(500)
+
+        robot_select = QPushButton("Select")
+        robot_select.pressed.connect(self.SelectRobot)
+        robot_select.setMinimumWidth(50)
+        robot_select.setMaximumWidth(50)
+
+        robot_label_box.addWidget(robot_label)
+        robot_label_box.addLayout(robot_button_box)
+        robot_button_box.addWidget(self.robot_path)
+        robot_button_box.addWidget(robot_select)
+
+        self.left_pane.addLayout(robot_label_box)
+
+        # Subject Selection
+        subject_label_box = QVBoxLayout()
+        subject_button_box = QHBoxLayout()
+        
+        subject_label = QLabel("Subject")
+        
+        self.subject_path = QTextEdit()
+        self.subject_path.setReadOnly(True)
+        self.subject_path.setMinimumHeight(input_height)
+        self.subject_path.setMaximumHeight(input_height)
+        self.subject_path.setMinimumWidth(500)
+
+        subject_select = QPushButton("Select")
+        subject_select.pressed.connect(self.SelectSubject)
+        subject_select.setMinimumWidth(50)
+        subject_select.setMaximumWidth(50)
+
+        subject_label_box.addWidget(subject_label)
+        subject_label_box.addLayout(subject_button_box)
+        subject_button_box.addWidget(self.subject_path)
+        subject_button_box.addWidget(subject_select)
+
+        self.left_pane.addLayout(subject_label_box)
+
+        # Trial Selection
+        trial_label_box = QVBoxLayout()
+        trial_button_box = QHBoxLayout()
+        
+        trial_label = QLabel("Trial")
+        
+        self.trial_path = QTextEdit()
+        self.trial_path.setReadOnly(True)
+        self.trial_path.setMinimumHeight(input_height)
+        self.trial_path.setMaximumHeight(input_height)
+        self.trial_path.setMinimumWidth(500)
+
+        trial_select = QPushButton("Select")
+        trial_select.pressed.connect(self.SelectTrial)
+        trial_select.setMinimumWidth(50)
+        trial_select.setMaximumWidth(50)
+
+        trial_label_box.addWidget(trial_label)
+        trial_label_box.addLayout(trial_button_box)
+        trial_button_box.addWidget(self.trial_path)
+        trial_button_box.addWidget(trial_select)
+
+        self.left_pane.addLayout(trial_label_box)
+
         consoleLayout = QVBoxLayout()
-        self.mainColumn.addLayout(consoleLayout)
+        self.right_pane.addLayout(consoleLayout)
 
 
         start = QPushButton("Start Trial")
@@ -50,13 +132,14 @@ class MainWindow(QMainWindow):
 
         load = QPushButton("Load Trial Type")
         load.setMinimumWidth(50)
-        load.pressed.connect(self.LoadJSON)
+        load.pressed.connect(self.LoadTargetJSON)
         upperButtons.addWidget(load)
 
         self.consoleLog = QTextEdit()
         #consoleLog.addScrollBarWidget()
         self.consoleLog.setReadOnly(True)
         self.consoleLog.setMinimumHeight(300)
+        self.consoleLog.setMinimumWidth(500)
         consoleLayout.addWidget(self.consoleLog)
 
         self.console = QTextEdit()
@@ -69,10 +152,44 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(self.mainColumn)
         self.setCentralWidget(widget)
-        
-    def LoadJSON(self):
+    
+
+    def SelectRobot(self):
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        self.robot_path.setText(selectedJSON[0])
+        robot_file = open(selectedJSON[0], "r+")
+        self.robot_fields = json.load(robot_file)
+        robot_file.close()
+
+    def SelectSubject(self):
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        self.subject_path.setText(selectedJSON[0])
+        subject_file = open(selectedJSON[0], "r+")
+        self.subject_fields = json.load(subject_file)
+        subject_file.close()
+
+    def SelectTrial(self):
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        self.trial_path.setText(selectedJSON[0])
+        trial_file = open(selectedJSON[0], "r+")
+        self.trial_fields = json.load(trial_file)
+        trial_file.close()
+
+    def LoadDefaults(self):
+        defaults_file_path = "source/jsons/defaults.json"
+        defaults_file = open(defaults_file_path)
+        self.defaults = json.load(defaults_file)
+        defaults_file.close()
+
+    def AssignDefaults(self):
+        # Will parse through the selected robots JSON and pick out the fields to use.
+        self.LoadDefaults()
+
+
+
+    def LoadTargetJSON(self):
         print("Load JSON here when implemented")
-        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons", filter = "JSON Files (*.json *.txt)")
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
         print(selectedJSON[0])
         with open(selectedJSON[0]) as json_file:
             buttons = json.load(json_file)
@@ -93,11 +210,11 @@ class MainWindow(QMainWindow):
                 holder_list_index = holder_list_index+1
             elif button_index == len(buttons["button_list"])-1:
                 using_buttons_list.append(button_holder_list[holder_list_index])
-            button_index = button_index+1
+            button_index += 1
 
         print(len(using_buttons_list))
         for i in range(len(using_buttons_list)):
-            self.mainColumn.addLayout(using_buttons_list[i])
+            self.right_pane.addLayout(using_buttons_list[i])
                 
 
 
@@ -181,11 +298,11 @@ def loop(que):
 
             app.exec_()
 
-        #if the que's first message is adressed to main (may implememnt total loop through later)
+        #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
         if que[0].startswith('UI'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
-            # parse the adress into just the command by spitiling and disposing
+            # parse the adress into just the command by spliting and disposing
             # of the first item
             cmd = addr.split('.')[1:]
 
