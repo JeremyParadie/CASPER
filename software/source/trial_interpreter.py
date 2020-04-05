@@ -1,4 +1,3 @@
-import logger
 import os
 
 # When instantiating a trial class both of the inputs, name and trial, should be included.

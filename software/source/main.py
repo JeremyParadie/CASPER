@@ -14,8 +14,8 @@ import threading
 
 #import threads
 import user_interface as ui
-import radio_communication as radio
-import trial_interpreter as ti
+import radio_communications as radio
+import trial_interpreter as ti 
 #FIXME: import debug_...
 
 #initialize the message_que for communitcation
@@ -28,7 +28,7 @@ threads = []
 args = (message_que,)
 
 ui_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
-threads.append(ti_thread)
+threads.append(ui_thread)
 
 radio_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
 threads.append(radio_thread)
@@ -68,4 +68,4 @@ if __name__ == '__main__':
     radio_thread.start()
     ti_thread.start()
 
-    loop(que)
+    loop(message_que)

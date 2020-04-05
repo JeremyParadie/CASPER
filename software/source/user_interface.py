@@ -8,17 +8,17 @@ class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        
+
         infoDialog = UserWindow(self)
         infoDialog.exec_()
 
         self.SetupWindow()
-        
-        
-        
+
+
+
     def SetupWindow(self):
         self.setWindowTitle("CASPER")
-        
+
         mainColumn = QVBoxLayout()
 
         upperButtons = QHBoxLayout()
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainColumn)
         self.setCentralWidget(widget)
-        
+
     def LoadJSON(self):
         print("Load JSON here when implemented")
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons", filter = "JSON Files (*.json *.txt)")
@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
 
 
 
-       
+
 
 
 
@@ -81,14 +81,14 @@ class UserWindow(QDialog):
 
         # Name Window
         self.setWindowTitle("CASPER")
-        
+
         # Create the main column
         vLayout = QVBoxLayout()
-        
+
         # Create the rows
         hLayout1 = QHBoxLayout()
         vLayout.addLayout(hLayout1)
-        
+
         hLayout2 = QHBoxLayout()
         vLayout.addLayout(hLayout2)
 
@@ -136,3 +136,6 @@ if __name__ == "__main__":
     window.show()
 
     app.exec_()
+
+#stop gap
+loop = lambda *args, **kwargs: None
