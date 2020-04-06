@@ -197,7 +197,7 @@ class MainWindow(QMainWindow):
         
         if "subject_path" in self.defaults:
             self.subject_path.setText(self.defaults["subject_path"])
-            self.LoadSubjectJSON(True)
+            self.LoadSubjectJSON(False)
             self.SetupSubjectFields()
         
         if "trial_path" in self.defaults:
@@ -218,6 +218,8 @@ class MainWindow(QMainWindow):
                 entry_field.setMinimumHeight(input_height)
                 entry_field.setMaximumHeight(input_height)
                 entry_field.setMinimumWidth(500)
+                if label in self.defaults:
+                    entry_field.setText(self.defaults[field])
 
                 label_box.addWidget(label)
                 label_box.addWidget(entry_field)
@@ -229,8 +231,8 @@ class MainWindow(QMainWindow):
 
 
 
-    def LoadSubjectJSON(self, manual = False):
-        if manual == False:
+    def LoadSubjectJSON(self, manual = True):
+        if manual == True:
             selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
             print(selectedJSON[0])
             with open(selectedJSON[0], "r") as json_file:
