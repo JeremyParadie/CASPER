@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
+        self.defaults_file_path = "jsons/defaults.txt"
         self.defaults = {}
         self.robot_fields = {}
         self.procedural_fields = {}
@@ -132,8 +133,8 @@ class MainWindow(QMainWindow):
 
         start = QPushButton("Start Trial")
         start.setMinimumWidth(50)
-        start.pressed.connect(self.StartTrial)
-        upperButtons.addWidget(start)
+        start.pressed.connect(self.Start)
+        self.left_pane.addWidget(start)
 
         load = QPushButton("Load Trial Type")
         load.setMinimumWidth(50)
@@ -182,8 +183,8 @@ class MainWindow(QMainWindow):
         trial_file.close()
 
     def LoadDefaults(self):
-        defaults_file_path = "jsons/defaults.txt"
-        defaults_file = open(defaults_file_path, "r+")
+        
+        defaults_file = open(self.defaults_file_path, "r+")
         self.defaults = json.load(defaults_file)
         defaults_file.close()
 
@@ -193,7 +194,6 @@ class MainWindow(QMainWindow):
 
         if "robot_path" in self.defaults:
             self.robot_path.setText(self.defaults["robot_path"])
-            #self.robot_fields = 
         
         if "subject_path" in self.defaults:
             self.subject_path.setText(self.defaults["subject_path"])
@@ -218,7 +218,7 @@ class MainWindow(QMainWindow):
                 entry_field.setMinimumHeight(input_height)
                 entry_field.setMaximumHeight(input_height)
                 entry_field.setMinimumWidth(500)
-                if label in self.defaults:
+                if field in self.defaults:
                     entry_field.setText(self.defaults[field])
 
                 label_box.addWidget(label)
@@ -264,15 +264,27 @@ class MainWindow(QMainWindow):
             self.right_pane.addLayout(using_buttons_list[i])
                 
 
-
-
-    def StartTrial(self):
-        print("Start trial when implemented")
-
     def ConsoleCommand(self):
         command = self.console.copy()
         self.console.clear()
         self.consoleLog.append(command)
+
+    def Start(self):
+        print("Starting trial!")
+        # Do the actual start stuff
+
+        # Then save to defaults
+        print("Saving Defaults")
+        self.defaults["robot_path"] = self.robot_path.toPlainText()
+        self.defaults["subject_path"] = self.subject_path.toPlainText()
+        self.defaults["trial_path"] = self.trial_path.toPlainText()
+
+        for field in self.procedural_fields.keys():
+            print("Saving " + field)
+            self.defaults[field] = self.procedural_fields[field][1].toPlainText()
+
+        with open(self.defaults_file_path, "w+") as dump_file:
+            json.dump(self.defaults, dump_file)
 
 
 
