@@ -1,1 +1,1 @@
-{"subject_path": "jsons/TestJSON.txt", "robot_path": "", "trial_path": "", "Example Field 1": "Example Data 1", "Example Field 2": "Example Data 2", "Example Field 3": "Example Data 3"}
+{"subject_path": "jsons/TestJSON.txt", "robot_path": "", "trial_path": "D:/CASPER/software/source/jsons/TestJSON.txt", "Example Field 1": "Per Van Dyke", "Example Field 2": "3:00 PM", "Example Field 3": "UMASS Campus", "Video Person": "Per", "Location": "Missouri", "Date": "4/6/2020", "Time": "10:13 PM"}

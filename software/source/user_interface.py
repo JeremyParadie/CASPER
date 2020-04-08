@@ -286,66 +286,6 @@ class MainWindow(QMainWindow):
         with open(self.defaults_file_path, "w+") as dump_file:
             json.dump(self.defaults, dump_file)
 
-
-
-       
-
-
-
-class UserWindow(QDialog):
-
-    def __init__(self, *args, **kwargs):
-        super(UserWindow, self).__init__(*args, **kwargs)
-
-        # Name Window
-        self.setWindowTitle("CASPER")
-        
-        # Create the main column
-        vLayout = QVBoxLayout()
-        
-        # Create the rows
-        hLayout1 = QHBoxLayout()
-        vLayout.addLayout(hLayout1)
-        
-        hLayout2 = QHBoxLayout()
-        vLayout.addLayout(hLayout2)
-
-        hLayout3 = QHBoxLayout()
-        vLayout.addLayout(hLayout3)
-
-        # Create the various buttons and assign them to proper rows
-        observer = QTextEdit()
-        observer.setFixedHeight(input_height)
-        observer.setPlaceholderText("Observer")
-        hLayout1.addWidget(observer)
-
-        recorder = QTextEdit()
-        recorder.setFixedHeight(input_height)
-        recorder.setPlaceholderText("Recorder")
-        hLayout1.addWidget(recorder)
-
-        videoPerson = QTextEdit()
-        videoPerson.setFixedHeight(input_height)
-        videoPerson.setPlaceholderText("Video Person")
-        hLayout1.addWidget(videoPerson)
-
-        date = QDateEdit()
-        hLayout2.addWidget(date)
-
-        location = QTextEdit()
-        location.setFixedHeight(input_height)
-        location.setPlaceholderText("Location")
-        hLayout2.addWidget(location)
-
-        submit = QPushButton("Submit")
-        submit.pressed.connect(self.SubmitData)
-        hLayout3.addWidget(submit)
-
-        self.setLayout(vLayout)
-
-    def SubmitData(self):
-        self.close()
-
 def loop(que):
 
     while True:
