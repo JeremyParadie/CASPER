@@ -30,10 +30,10 @@ args = (message_que,)
 ui_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
 threads.append(ui_thread)
 
-radio_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
+radio_thread = threading.Thread(target=radio.loop, args=args, daemon=True)
 threads.append(radio_thread)
 
-ti_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
+ti_thread = threading.Thread(target=ti.loop, args=args, daemon=True)
 threads.append(ti_thread)
 
 
@@ -41,10 +41,10 @@ threads.append(ti_thread)
 #this is pretending to be a loop
 def loop(que):
     """
-    desc: the loop used to onitor the message_que for exit commands;
+    desc: the loop used to monitor the message_que for exit commands;
     """
 
-    #setp goes here:
+    #setup goes here:
     #    instantiang classes
 
     while True:

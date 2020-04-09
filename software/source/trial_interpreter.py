@@ -1,4 +1,10 @@
 import os
+import csv
+
+#TODO Recieve Commands:
+#Trial.load
+#Trial.start
+#Trial.end
 
 # When instantiating a trial class both of the inputs, name and trial, should be included.
 #Their current defaults are for demonstration/testing purposes only.
@@ -14,6 +20,15 @@ import os
 
 # If you wish too add new methods they should either return a string that the comms support as a command, or push a sequence of
 #supported methods onto the exec stack that create the desired behavior
+
+class Logger:
+
+	def __init__(self, csvFile):
+		self.log = open(csvFile, 'w')
+		self.writer = csv.writer(self.log, delimiter=',')
+
+	def write(self, time, event):
+		self.writer.writerow([time, event])
 
 class Trial: # this will be an instance of a trial, re-instantiated for each new trial
 
