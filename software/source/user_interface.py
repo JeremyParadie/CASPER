@@ -163,6 +163,9 @@ class MainWindow(QMainWindow):
 
     def SelectRobot(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        print(selectedJSON)
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
         self.robot_path.setText(selectedJSON[0])
         robot_file = open(selectedJSON[0], "r+")
         self.robot_fields = json.load(robot_file)
@@ -170,6 +173,8 @@ class MainWindow(QMainWindow):
 
     def SelectSubject(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
         self.subject_path.setText(selectedJSON[0])
         subject_file = open(selectedJSON[0], "r+")
         self.subject_fields = json.load(subject_file)
@@ -177,6 +182,8 @@ class MainWindow(QMainWindow):
 
     def SelectTrial(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
         self.trial_path.setText(selectedJSON[0])
         trial_file = open(selectedJSON[0], "r+")
         self.trial_fields = json.load(trial_file)
@@ -234,6 +241,8 @@ class MainWindow(QMainWindow):
     def LoadSubjectJSON(self, manual = True):
         if manual == True:
             selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+            if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
             print(selectedJSON[0])
             with open(selectedJSON[0], "r") as json_file:
                 buttons = json.load(json_file)
