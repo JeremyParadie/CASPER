@@ -38,9 +38,22 @@ class MainWindow(QMainWindow):
 
         self.mainColumn = QVBoxLayout()
 
-        upperButtons = QHBoxLayout()
-        upperButtons.setSpacing(500)
-        self.mainColumn.addLayout(upperButtons)
+        #Create the toolbar and its widgets
+        toolbar = QToolBar()
+        toolbar.setMovable(False)
+        self.addToolBar(toolbar)
+
+        #toolbar_spacer = QWidget()
+        #toolbar_spacer.setSizePolicy(QSizePolicy())
+
+        battery_status = QLabel("Battery: ___%")
+        toolbar.addWidget(battery_status)
+
+        toolbar.addSeparator()
+
+        signal_strength = QLabel("Signal: Placeholder")
+        toolbar.addWidget(signal_strength)
+
 
         self.left_pane = QVBoxLayout()
         self.right_pane = QVBoxLayout()
@@ -127,6 +140,15 @@ class MainWindow(QMainWindow):
         self.left_pane.addLayout(self.procedural_pane)
 
 
+
+        phase_status = QLabel("Phase: X")
+        phase_status.setStyleSheet("QLabel { min-width: 100% }")
+        self.right_pane.addWidget(phase_status)
+
+        time_display = QLabel("Time: 00:00:00")
+        self.right_pane.addWidget(time_display)
+
+
         consoleLayout = QVBoxLayout()
         self.right_pane.addLayout(consoleLayout)
 
@@ -135,11 +157,6 @@ class MainWindow(QMainWindow):
         start.setMinimumWidth(50)
         start.pressed.connect(self.Start)
         self.left_pane.addWidget(start)
-
-        load = QPushButton("Load Trial Type")
-        load.setMinimumWidth(50)
-        load.pressed.connect(self.LoadSubjectJSON)
-        upperButtons.addWidget(load)
 
         self.consoleLog = QTextEdit()
         self.consoleLog.setReadOnly(True)
