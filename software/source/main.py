@@ -11,9 +11,11 @@ FIXME: talk about the project architecture here.
 """
 # import normal packages
 import threading
+import sys
 
 #import threads
 import user_interface as ui
+from user_interface import *
 import radio_communications as radio
 import trial_interpreter as ti
 #FIXME: import debug_...
@@ -67,5 +69,6 @@ if __name__ == '__main__':
     ui_thread.start()
     radio_thread.start()
     ti_thread.start()
+    threading.Thread(target=loop, args=args, daemon=True).start()
 
-    loop(message_que)
+    ui.qt_loop(message_que)

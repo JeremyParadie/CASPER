@@ -27,7 +27,7 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
         while (csvExists == True):
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
-        self.logger = logger.Logger("logs/" + name + str(i) + ".csv")
+        self.logger = Logger("logs/" + name + str(i) + ".csv")
 
     def getName(self):
         return self.name
@@ -44,7 +44,7 @@ def loop(que):
     """
     current_trial = Trial()
 
-    if que[0].startswith('trial'):
+    if len(que) and que[0].startswith('trial'):
         # fetch the message from the top of the que
         addr, retaddr, args  = que.pop(0)
         # parse the adress into just the command by spitiling and disposing

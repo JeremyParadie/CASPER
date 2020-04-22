@@ -16,7 +16,7 @@ from pathlib import Path
 
 row_length = 5
 input_height = 30
-UI_active = False
+enable_ui = True
 
 # Class containing all code for the main window
 class MainWindow(QMainWindow):
@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
         start = QPushButton("Start Trial")
         start.setMinimumWidth(50)
         start.pressed.connect(self.StartTrial)
-        upperButtons.addWidget(start)
+        #upperButtons.addWidget(start)
 
         #load = QPushButton("Load Trial Type")
         #load.setMinimumWidth(50)
@@ -185,7 +185,7 @@ class MainWindow(QMainWindow):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
         print(selectedJSON)
         if selectedJSON[0] == "" or selectedJSON[0] is None:
-                return 
+                return
 
         self.robot_path.setText(selectedJSON[0])
         robot_file = open(selectedJSON[0], "r+")
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
     def SelectSubject(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
         if selectedJSON[0] == "" or selectedJSON[0] is None:
-                return 
+                return
 
         self.subject_path.setText(selectedJSON[0])
         subject_file = open(selectedJSON[0], "r+")
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
     def SelectTrial(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
         if selectedJSON[0] == "" or selectedJSON[0] is None:
-                return 
+                return
 
         self.trial_path.setText(selectedJSON[0])
         trial_file = open(selectedJSON[0], "r+")
@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):
         if manual == True:
             selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
             if selectedJSON[0] == "" or selectedJSON[0] is None:
-                return 
+                return
             print(selectedJSON[0])
             with open(selectedJSON[0], "r") as json_file:
                 buttons = json.load(json_file)
@@ -273,11 +273,6 @@ class MainWindow(QMainWindow):
         command = self.console.copy()
         self.console.clear()
         self.consoleLog.append(command)
-
-
-
-
-
 
 
 class UserWindow(QDialog):
@@ -334,25 +329,24 @@ class UserWindow(QDialog):
     def SubmitData(self):
         self.close()
 
-def loop(que):
+def qt_loop(que):
 
-    while True:
-        if not UI_active:
-            app = QApplication(sys.argv)
+    if enable_ui:
+        app = QApplication(sys.argv)
 
-            window = MainWindow()
-            window.show()
+        window = MainWindow()
+        window.show()
 
-            app.exec_()
+        app.exec_()
 
-        #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
-        if que[0].startswith('UI'):
-            # fetch the message from the top of the que
-            addr, retaddr, args  = que.pop(0)
-            # parse the adress into just the command by spliting and disposing
-            # of the first item
-            cmd = addr.split('.')[1:]
-
+def loop():
+    #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
+    if que[0].startswith('UI'):
+        # fetch the message from the top of the que
+        addr, retaddr, args  = que.pop(0)
+        # parse the adress into just the command by spliting and disposing
+        # of the first item
+        cmd = addr.split('.')[1:]
 
 
 if __name__ == "__main__":
@@ -362,6 +356,3 @@ if __name__ == "__main__":
     window.show()
 
     app.exec_()
-
-#stop gap
-loop = lambda *args, **kwargs: None
