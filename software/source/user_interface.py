@@ -36,9 +36,22 @@ class MainWindow(QMainWindow):
 
         self.mainColumn = QVBoxLayout()
 
-        upperButtons = QHBoxLayout()
-        upperButtons.setSpacing(500)
-        self.mainColumn.addLayout(upperButtons)
+        #Create the toolbar and its widgets
+        toolbar = QToolBar()
+        toolbar.setMovable(False)
+        self.addToolBar(toolbar)
+
+        #toolbar_spacer = QWidget()
+        #toolbar_spacer.setSizePolicy(QSizePolicy())
+
+        battery_status = QLabel("Battery: ___%")
+        toolbar.addWidget(battery_status)
+
+        toolbar.addSeparator()
+
+        signal_strength = QLabel("Signal: Placeholder")
+        toolbar.addWidget(signal_strength)
+
 
         self.left_pane = QVBoxLayout()
         self.right_pane = QVBoxLayout()
@@ -121,6 +134,20 @@ class MainWindow(QMainWindow):
 
         self.left_pane.addLayout(trial_label_box)
 
+        self.procedural_pane = QVBoxLayout()
+        self.left_pane.addLayout(self.procedural_pane)
+
+
+
+        phase_status = QLabel("Phase: X")
+        phase_status.setStyleSheet("QLabel { min-width: 100% }")
+        self.right_pane.addWidget(phase_status)
+
+        time_display = QLabel("Time: 00:00:00")
+        self.right_pane.addWidget(time_display)
+
+
+
         consoleLayout = QVBoxLayout()
         self.right_pane.addLayout(consoleLayout)
 
@@ -130,10 +157,10 @@ class MainWindow(QMainWindow):
         start.pressed.connect(self.StartTrial)
         upperButtons.addWidget(start)
 
-        load = QPushButton("Load Trial Type")
-        load.setMinimumWidth(50)
-        load.pressed.connect(self.LoadTargetJSON)
-        upperButtons.addWidget(load)
+        #load = QPushButton("Load Trial Type")
+        #load.setMinimumWidth(50)
+        #load.pressed.connect(self.LoadTargetJSON)
+        #upperButtons.addWidget(load)
 
         self.consoleLog = QTextEdit()
         #consoleLog.addScrollBarWidget()
@@ -155,21 +182,31 @@ class MainWindow(QMainWindow):
 
 
     def SelectRobot(self):
-        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        print(selectedJSON)
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
+
         self.robot_path.setText(selectedJSON[0])
         robot_file = open(selectedJSON[0], "r+")
         self.robot_fields = json.load(robot_file)
         robot_file.close()
 
     def SelectSubject(self):
-        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
+
         self.subject_path.setText(selectedJSON[0])
         subject_file = open(selectedJSON[0], "r+")
         self.subject_fields = json.load(subject_file)
         subject_file.close()
 
     def SelectTrial(self):
-        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
+        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
+
         self.trial_path.setText(selectedJSON[0])
         trial_file = open(selectedJSON[0], "r+")
         self.trial_fields = json.load(trial_file)
@@ -184,15 +221,25 @@ class MainWindow(QMainWindow):
     def AssignDefaults(self):
         # Will parse through the selected robots JSON and pick out the fields to use.
         self.LoadDefaults()
+        self.procedural_fields[field] = [label, entry_field]
+
+        self.procedural_pane.addLayout(label_box)
 
 
 
-    def LoadTargetJSON(self):
-        print("Load JSON here when implemented")
-        selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "/source/jsons/", filter = "JSON Files (*.json *.txt)")
-        print(selectedJSON[0])
-        with open(selectedJSON[0]) as json_file:
-            buttons = json.load(json_file)
+
+    def LoadSubjectJSON(self, manual = True):
+        if manual == True:
+            selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+            if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return 
+            print(selectedJSON[0])
+            with open(selectedJSON[0], "r") as json_file:
+                buttons = json.load(json_file)
+        else:
+            with open(self.defaults["subject_path"], "r") as subject_json:
+                buttons = json.load(subject_json)
+
 
         button_holder_list = []
         for _ in range(((len(buttons["button_list"])//row_length)+1)):
