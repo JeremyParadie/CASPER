@@ -9,7 +9,7 @@ import queue
 import time
 from example_commands import examples
 
-
+use_radio = False
 
 def port_scan():
     #find all '/dev/tty.usbmodem#####' of of all the devices in /dev/
@@ -20,6 +20,34 @@ def port_scan():
     path = found_ports[0]
     return path
 
+class FakeRadio():
+
+    def __init__(self, *args, **kwargs):
+        self._responces = []
+
+    def write(self, msg):
+        """
+        desc: send a message. this fetches a proper example responce;
+        arg str msg: the string to write to the fake serial port;
+        returns NoneType;
+        """
+        # remove any arguments
+        while '  ' in msg:
+            msg.replace('  ', ' ')
+        msg = ' '.join(msg.split(' ')[0:3])
+
+        #fetch a responce from the examples
+        for key, value in examples.items():
+            if key.startswith(msg):
+                self._responces.append(value)
+        else:
+            self._responces.append('')
+
+    def readline(self):
+        if len(self._responces):
+            return self._responces.pop(0)
+        else:
+            return ''
 
 def loop(que):
     """
@@ -35,11 +63,19 @@ def loop(que):
     #   in the beggining we won;t implement that in most threads
 
     #instatiate any objects the loop will manage:
-    radio = serial.Serial(port=port_scan(), baudrate=9600, timeout=.15)
+    #FIXME: adapt to use
+    if use_radio:
+        #attempt to make the radio
+        try:
+            radio = serial.Serial(port=port_scan(), baudrate=9600, timeout=.15)
+        except:
+            raise Exception("radio not plugged in?")
+    else:
+        radio = FakeRadio()
 
     while True:
         # if the que's first message is adressed to radio (may implememnt total loop through later)
-        if que[0].startswith('radio'):
+        if len(que) and que[0].startswith('radio'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing

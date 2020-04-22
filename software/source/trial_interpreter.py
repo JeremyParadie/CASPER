@@ -44,3 +44,5 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
         self.logger = logger.Logger("logs/" + name + str(i) + ".csv")
+
+loop = lambda *args, **kwargs: None

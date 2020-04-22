@@ -15,7 +15,7 @@ import threading
 #import threads
 import user_interface as ui
 import radio_communications as radio
-import trial_interpreter as ti 
+import trial_interpreter as ti
 #FIXME: import debug_...
 
 #initialize the message_que for communitcation
@@ -50,7 +50,7 @@ def loop(que):
     while True:
 
         #if the que's first message is adressed to main (may implememnt total loop through later)
-        if que[0].startswith('main'):
+        if len(que) and que[0].startswith('main'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing
