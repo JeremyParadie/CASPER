@@ -14,7 +14,7 @@ import threading
 
 #import threads
 import user_interface as ui
-import radio_communication as radio
+import radio_communications as radio
 import trial_interpreter as ti
 #FIXME: import debug_...
 
@@ -28,7 +28,7 @@ threads = []
 args = (message_que,)
 
 ui_thread = threading.Thread(target=ui.loop, args=args, daemon=True)
-threads.append(ti_thread)
+threads.append(ui_thread)
 
 radio_thread = threading.Thread(target=radio.loop, args=args, daemon=True)
 threads.append(radio_thread)
@@ -38,7 +38,7 @@ threads.append(ti_thread)
 
 
 ### define main task threads resources and loop ###
-
+#this is pretending to be a loop
 def loop(que):
     """
     desc: the loop used to monitor the message_que for exit commands;
@@ -50,7 +50,7 @@ def loop(que):
     while True:
 
         #if the que's first message is adressed to main (may implememnt total loop through later)
-        if que[0].startswith('main'):
+        if len(que) and que[0].startswith('main'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing
@@ -68,4 +68,4 @@ if __name__ == '__main__':
     radio_thread.start()
     ti_thread.start()
 
-    loop(que)
+    loop(message_que)
