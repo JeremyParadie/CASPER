@@ -1,5 +1,5 @@
 """
-The Actual User interface for the CASPER Robot. 
+The Actual User interface for the CASPER Robot.
 Controls UI appearence, Importing of buttons, and importing of data fields.
 
 Author: Per Van Dyke
@@ -16,7 +16,7 @@ from pathlib import Path
 
 row_length = 5
 input_height = 30
-UI_active = False
+enable_ui = True
 
 # Class containing all code for the main window
 class MainWindow(QMainWindow):
@@ -24,23 +24,34 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        self.defaults_file_path = "jsons/defaults.txt"
         self.defaults = {}
         self.robot_fields = {}
-        self.procedural_fields = {}
 
         self.SetupWindow()
-        
-        
-        
+
+
+
     def SetupWindow(self):
         self.setWindowTitle("CASPER")
 
         self.mainColumn = QVBoxLayout()
 
-        upperButtons = QHBoxLayout()
-        upperButtons.setSpacing(500)
-        self.mainColumn.addLayout(upperButtons)
+        #Create the toolbar and its widgets
+        toolbar = QToolBar()
+        toolbar.setMovable(False)
+        self.addToolBar(toolbar)
+
+        #toolbar_spacer = QWidget()
+        #toolbar_spacer.setSizePolicy(QSizePolicy())
+
+        battery_status = QLabel("Battery: ___%")
+        toolbar.addWidget(battery_status)
+
+        toolbar.addSeparator()
+
+        signal_strength = QLabel("Signal: Placeholder")
+        toolbar.addWidget(signal_strength)
+
 
         self.left_pane = QVBoxLayout()
         self.right_pane = QVBoxLayout()
@@ -54,9 +65,9 @@ class MainWindow(QMainWindow):
         # Robot Selection
         robot_label_box = QVBoxLayout()
         robot_button_box = QHBoxLayout()
-        
+
         robot_label = QLabel("Robot")
-        
+
         self.robot_path = QTextEdit()
         self.robot_path.setReadOnly(True)
         self.robot_path.setMinimumHeight(input_height)
@@ -78,9 +89,9 @@ class MainWindow(QMainWindow):
         # Subject Selection
         subject_label_box = QVBoxLayout()
         subject_button_box = QHBoxLayout()
-        
+
         subject_label = QLabel("Subject")
-        
+
         self.subject_path = QTextEdit()
         self.subject_path.setReadOnly(True)
         self.subject_path.setMinimumHeight(input_height)
@@ -102,9 +113,9 @@ class MainWindow(QMainWindow):
         # Trial Selection
         trial_label_box = QVBoxLayout()
         trial_button_box = QHBoxLayout()
-        
+
         trial_label = QLabel("Trial")
-        
+
         self.trial_path = QTextEdit()
         self.trial_path.setReadOnly(True)
         self.trial_path.setMinimumHeight(input_height)
@@ -127,21 +138,32 @@ class MainWindow(QMainWindow):
         self.left_pane.addLayout(self.procedural_pane)
 
 
+
+        phase_status = QLabel("Phase: X")
+        phase_status.setStyleSheet("QLabel { min-width: 100% }")
+        self.right_pane.addWidget(phase_status)
+
+        time_display = QLabel("Time: 00:00:00")
+        self.right_pane.addWidget(time_display)
+
+
+
         consoleLayout = QVBoxLayout()
         self.right_pane.addLayout(consoleLayout)
 
 
         start = QPushButton("Start Trial")
         start.setMinimumWidth(50)
-        start.pressed.connect(self.Start)
-        self.left_pane.addWidget(start)
+        start.pressed.connect(self.StartTrial)
+        #upperButtons.addWidget(start)
 
-        load = QPushButton("Load Trial Type")
-        load.setMinimumWidth(50)
-        load.pressed.connect(self.LoadSubjectJSON)
-        upperButtons.addWidget(load)
+        #load = QPushButton("Load Trial Type")
+        #load.setMinimumWidth(50)
+        #load.pressed.connect(self.LoadTargetJSON)
+        #upperButtons.addWidget(load)
 
         self.consoleLog = QTextEdit()
+        #consoleLog.addScrollBarWidget()
         self.consoleLog.setReadOnly(True)
         self.consoleLog.setMinimumHeight(300)
         self.consoleLog.setMinimumWidth(500)
@@ -149,20 +171,22 @@ class MainWindow(QMainWindow):
 
         self.console = QTextEdit()
         self.console.setMaximumHeight(input_height)
+        #self.console.
         consoleLayout.addWidget(self.console)
 
-        # Initialize Defaults as possible
-        self.AssignDefaults()
+
 
         widget = QWidget()
         widget.setLayout(self.mainColumn)
         self.setCentralWidget(widget)
 
 
-    
-
     def SelectRobot(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        print(selectedJSON)
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return
+
         self.robot_path.setText(selectedJSON[0])
         robot_file = open(selectedJSON[0], "r+")
         self.robot_fields = json.load(robot_file)
@@ -170,6 +194,9 @@ class MainWindow(QMainWindow):
 
     def SelectSubject(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return
+
         self.subject_path.setText(selectedJSON[0])
         subject_file = open(selectedJSON[0], "r+")
         self.subject_fields = json.load(subject_file)
@@ -177,56 +204,26 @@ class MainWindow(QMainWindow):
 
     def SelectTrial(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+        if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return
+
         self.trial_path.setText(selectedJSON[0])
         trial_file = open(selectedJSON[0], "r+")
         self.trial_fields = json.load(trial_file)
         trial_file.close()
 
     def LoadDefaults(self):
-        
-        defaults_file = open(self.defaults_file_path, "r+")
+        defaults_file_path = "source/jsons/defaults.json"
+        defaults_file = open(defaults_file_path)
         self.defaults = json.load(defaults_file)
         defaults_file.close()
 
     def AssignDefaults(self):
-
+        # Will parse through the selected robots JSON and pick out the fields to use.
         self.LoadDefaults()
+        self.procedural_fields[field] = [label, entry_field]
 
-        if "robot_path" in self.defaults:
-            self.robot_path.setText(self.defaults["robot_path"])
-        
-        if "subject_path" in self.defaults:
-            self.subject_path.setText(self.defaults["subject_path"])
-            self.LoadSubjectJSON(False)
-            self.SetupSubjectFields()
-        
-        if "trial_path" in self.defaults:
-            self.trial_path.setText(self.defaults["trial_path"])
-
-
-    def SetupSubjectFields(self):
-
-        with open(self.defaults["subject_path"], "r") as subject_json:
-            subject_json_dict = json.load(subject_json)
-
-            for field in subject_json_dict["subject_fields"]:
-                label_box = QVBoxLayout()
-                
-                label = QLabel(field)
-                
-                entry_field = QTextEdit()
-                entry_field.setMinimumHeight(input_height)
-                entry_field.setMaximumHeight(input_height)
-                entry_field.setMinimumWidth(500)
-                if field in self.defaults:
-                    entry_field.setText(self.defaults[field])
-
-                label_box.addWidget(label)
-                label_box.addWidget(entry_field)
-
-                self.procedural_fields[field] = [label, entry_field]
-
-                self.procedural_pane.addLayout(label_box)
+        self.procedural_pane.addLayout(label_box)
 
 
 
@@ -234,12 +231,15 @@ class MainWindow(QMainWindow):
     def LoadSubjectJSON(self, manual = True):
         if manual == True:
             selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
+            if selectedJSON[0] == "" or selectedJSON[0] is None:
+                return
             print(selectedJSON[0])
             with open(selectedJSON[0], "r") as json_file:
                 buttons = json.load(json_file)
         else:
             with open(self.defaults["subject_path"], "r") as subject_json:
                 buttons = json.load(subject_json)
+
 
         button_holder_list = []
         for _ in range(((len(buttons["button_list"])//row_length)+1)):
@@ -262,34 +262,17 @@ class MainWindow(QMainWindow):
         print(len(using_buttons_list))
         for i in range(len(using_buttons_list)):
             self.right_pane.addLayout(using_buttons_list[i])
-                
+
+
+
+
+    def StartTrial(self):
+        print("Start trial when implemented")
 
     def ConsoleCommand(self):
         command = self.console.copy()
         self.console.clear()
         self.consoleLog.append(command)
-
-    def Start(self):
-        print("Starting trial!")
-        # Do the actual start stuff
-
-        # Then save to defaults
-        print("Saving Defaults")
-        self.defaults["robot_path"] = self.robot_path.toPlainText()
-        self.defaults["subject_path"] = self.subject_path.toPlainText()
-        self.defaults["trial_path"] = self.trial_path.toPlainText()
-
-        for field in self.procedural_fields.keys():
-            print("Saving " + field)
-            self.defaults[field] = self.procedural_fields[field][1].toPlainText()
-
-        with open(self.defaults_file_path, "w+") as dump_file:
-            json.dump(self.defaults, dump_file)
-
-
-
-       
-
 
 
 class UserWindow(QDialog):
@@ -299,14 +282,14 @@ class UserWindow(QDialog):
 
         # Name Window
         self.setWindowTitle("CASPER")
-        
+
         # Create the main column
         vLayout = QVBoxLayout()
-        
+
         # Create the rows
         hLayout1 = QHBoxLayout()
         vLayout.addLayout(hLayout1)
-        
+
         hLayout2 = QHBoxLayout()
         vLayout.addLayout(hLayout2)
 
@@ -346,25 +329,24 @@ class UserWindow(QDialog):
     def SubmitData(self):
         self.close()
 
-def loop(que):
+def qt_loop(que):
 
-    while True:
-        if not UI_active:
-            app = QApplication(sys.argv)
+    if enable_ui:
+        app = QApplication(sys.argv)
 
-            window = MainWindow()
-            window.show()
+        window = MainWindow()
+        window.show()
 
-            app.exec_()
+        app.exec_()
 
-        #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
-        if que[0].startswith('UI'):
-            # fetch the message from the top of the que
-            addr, retaddr, args  = que.pop(0)
-            # parse the adress into just the command by spliting and disposing
-            # of the first item
-            cmd = addr.split('.')[1:]
-
+def loop():
+    #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
+    if que[0].startswith('UI'):
+        # fetch the message from the top of the que
+        addr, retaddr, args  = que.pop(0)
+        # parse the adress into just the command by spliting and disposing
+        # of the first item
+        cmd = addr.split('.')[1:]
 
 
 if __name__ == "__main__":

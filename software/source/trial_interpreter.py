@@ -44,7 +44,7 @@ def loop(que):
     """
     current_trial = Trial()
 
-    if que[0].startswith('trial'):
+    if len(que) and que[0].startswith('trial'):
         # fetch the message from the top of the que
         addr, retaddr, args  = que.pop(0)
         # parse the adress into just the command by spitiling and disposing
@@ -57,7 +57,7 @@ def loop(que):
 
             que.append((retaddr, None, current_trial.run()))
 
-            
+
         elif cmd_type == 'end':
             current_trial.logger.log.close()
 

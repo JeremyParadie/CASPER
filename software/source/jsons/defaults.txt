@@ -1,1 +1,7 @@
-{"subject_path": "jsons/TestJSON.txt", "robot_path": "", "trial_path": "", "Example Field 1": "Example Data 1", "Example Field 2": "Example Data 2", "Example Field 3": "Example Data 3"}
+{
+    "subject_path": "jsons/TestJSON.txt",
+    "robot_path": "",
+    "trial_path": "",
+    "Example Field 1": "Example Data 1",
+    "Example Field 2": "Example Data 2",
+    "Example Field 3": "Example Data 3"}
