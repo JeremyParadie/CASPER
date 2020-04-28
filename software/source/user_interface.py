@@ -16,7 +16,18 @@ from pathlib import Path
 
 row_length = 5
 input_height = 30
-enable_ui = True
+
+#ignore that this was added (i assume the "css" will cover this)
+button_width = 70
+textfield_width = 300
+
+# _message_queue needs to be overwritten with
+#   the correct queue to the use below function
+_message_queue = None
+
+def send_message(addr, retaddr=None, args=()):
+    global _message_queue
+    _message_queue.append((addr, retaddr, args))
 
 # Class containing all code for the main window
 class MainWindow(QMainWindow):
@@ -72,12 +83,13 @@ class MainWindow(QMainWindow):
         self.robot_path.setReadOnly(True)
         self.robot_path.setMinimumHeight(input_height)
         self.robot_path.setMaximumHeight(input_height)
-        self.robot_path.setMinimumWidth(500)
+        self.robot_path.setMinimumWidth(textfield_width)
+        self.robot_path.setMaximumWidth(textfield_width)
 
         robot_select = QPushButton("Select")
         robot_select.pressed.connect(self.SelectRobot)
-        robot_select.setMinimumWidth(50)
-        robot_select.setMaximumWidth(50)
+        robot_select.setMinimumWidth(button_width)
+        robot_select.setMaximumWidth(button_width)
 
         robot_label_box.addWidget(robot_label)
         robot_label_box.addLayout(robot_button_box)
@@ -96,12 +108,13 @@ class MainWindow(QMainWindow):
         self.subject_path.setReadOnly(True)
         self.subject_path.setMinimumHeight(input_height)
         self.subject_path.setMaximumHeight(input_height)
-        self.subject_path.setMinimumWidth(500)
+        self.subject_path.setMinimumWidth(textfield_width)
+        self.subject_path.setMaximumWidth(textfield_width)
 
         subject_select = QPushButton("Select")
         subject_select.pressed.connect(self.SelectSubject)
-        subject_select.setMinimumWidth(50)
-        subject_select.setMaximumWidth(50)
+        subject_select.setMinimumWidth(button_width)
+        subject_select.setMaximumWidth(button_width)
 
         subject_label_box.addWidget(subject_label)
         subject_label_box.addLayout(subject_button_box)
@@ -120,12 +133,13 @@ class MainWindow(QMainWindow):
         self.trial_path.setReadOnly(True)
         self.trial_path.setMinimumHeight(input_height)
         self.trial_path.setMaximumHeight(input_height)
-        self.trial_path.setMinimumWidth(500)
+        self.trial_path.setMinimumWidth(textfield_width)
+        self.trial_path.setMaximumWidth(textfield_width)
 
         trial_select = QPushButton("Select")
         trial_select.pressed.connect(self.SelectTrial)
-        trial_select.setMinimumWidth(50)
-        trial_select.setMaximumWidth(50)
+        trial_select.setMinimumWidth(button_width)
+        trial_select.setMaximumWidth(button_width)
 
         trial_label_box.addWidget(trial_label)
         trial_label_box.addLayout(trial_button_box)
@@ -155,6 +169,7 @@ class MainWindow(QMainWindow):
         start = QPushButton("Start Trial")
         start.setMinimumWidth(50)
         start.pressed.connect(self.StartTrial)
+        self.left_pane.addWidget(start)
         #upperButtons.addWidget(start)
 
         #load = QPushButton("Load Trial Type")
@@ -213,7 +228,7 @@ class MainWindow(QMainWindow):
         trial_file.close()
 
     def LoadDefaults(self):
-        defaults_file_path = "source/jsons/defaults.json"
+        defaults_file_path = "./defaults.json"
         defaults_file = open(defaults_file_path)
         self.defaults = json.load(defaults_file)
         defaults_file.close()
@@ -224,9 +239,6 @@ class MainWindow(QMainWindow):
         self.procedural_fields[field] = [label, entry_field]
 
         self.procedural_pane.addLayout(label_box)
-
-
-
 
     def LoadSubjectJSON(self, manual = True):
         if manual == True:
@@ -249,7 +261,11 @@ class MainWindow(QMainWindow):
         holder_list_index = 0
         button_index = 0
         print(len(buttons["button_list"]))
-        for button in buttons["button_list"]:
+
+        # the key is the letter that a user sohuld be able to press on
+        #   the keyboard insread of clicking the button
+        for key, message in buttons["button_list"].items():
+            button = "{}-{}".format(key, message)
             button_widget = QPushButton(button)
             button_holder_list[holder_list_index].addWidget(button_widget)
             if button_holder_list[holder_list_index].count() >= 5:
@@ -264,10 +280,9 @@ class MainWindow(QMainWindow):
             self.right_pane.addLayout(using_buttons_list[i])
 
 
-
-
     def StartTrial(self):
         print("Start trial when implemented")
+        send_message('trial.start', None, ('trialfile_path_here', 'subject_path_here', 'robot_path_here'))
 
     def ConsoleCommand(self):
         command = self.console.copy()
@@ -329,24 +344,64 @@ class UserWindow(QDialog):
     def SubmitData(self):
         self.close()
 
-def qt_loop(que):
 
-    if enable_ui:
-        app = QApplication(sys.argv)
+def qt_loop():
+    global window
 
-        window = MainWindow()
-        window.show()
+    app = QApplication(sys.argv)
 
-        app.exec_()
+    window = MainWindow()
+    window.show()
 
-def loop():
-    #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
-    if que[0].startswith('UI'):
-        # fetch the message from the top of the que
-        addr, retaddr, args  = que.pop(0)
-        # parse the adress into just the command by spliting and disposing
-        # of the first item
-        cmd = addr.split('.')[1:]
+    app.exec_()
+
+def loop(que):
+    """
+    commands (proposed)
+    partyl implemented
+    ui.status.battery_percentage -> sets it to the first item im args
+    ui.status.signal -> only sets the signal, should be passed a single string to display
+
+    needs implememntation:
+    ui.switch_pane -> switches to right pane active if args[0] is True,
+        otherwise switched to the left pane.
+    ui.timer.start -> resets and starts the time
+    ui.timer.stop -> stops the timer
+    ui.phase -> sets the phase (a number) message to arg[0]
+    """
+    global window
+    global _message_queue
+    _message_queue = que
+
+    while True:
+        #if the que's first message is adressed to user_intterface (may implememnt total loop through later)
+        if len(que) and que[0][0].startswith('ui'):
+            # fetch the message from the top of the que
+            addr, retaddr, args  = que.pop(0)
+            responce = None
+            # parse the adress into just the command by spliting and disposing
+            # of the first item
+            cmd = addr.split('.')[1:]
+            while len(cmd) < 3:
+                cmd.append('')
+            cmd_type = cmd[0]
+
+            #loop example see commands speficief above
+            if cmd_type == 'status':
+                if len(args):
+                    if cmd[1] == 'battery_percentage':
+                        pass# window.battery_percentage = args[0]
+                    elif cmd[1] == 'signal':
+                        pass# window.signal = args[0]
+                else:
+                    pass # raise error
+            #other command types
+
+            if (retaddr is not None) and (respond is not None):
+                #send a message, not asking for responce
+                send_message(retaddr, None, responce)
+
+
 
 
 if __name__ == "__main__":

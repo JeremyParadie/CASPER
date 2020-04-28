@@ -1,0 +1,19 @@
+{
+    "buttons": {
+        "t":"tree",
+        "g":"ground",
+        "s":"skree",
+        "a":"foo",
+        "b":"bar",
+        "c":"baz",
+        "s":"snap",
+        "c":"crackle",
+        "p":"pop",
+    },
+    "subject_fields": [
+        "Example Field 1",
+        "Example Field 2",
+        "Example Field 3",
+        "videographer"
+    ]
+}
