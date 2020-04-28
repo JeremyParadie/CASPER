@@ -40,11 +40,12 @@ def loop(que):
     desc: the loop used to manage talking to the trial interpreter.
     possible commands:
         'trial.start' -> runs the specified trial file and returns its outputs
+			arg inputs are it the order ('trialfile_path', 'subject_path', 'robot_path', {dict of subject information})
         'trial.end' -> closes the open log file for the current trial, and stops trial
     """
     current_trial = Trial()
 
-    if len(que) and que[0].startswith('trial'):
+    if len(que) and que[0][0].startswith('trial'):
         # fetch the message from the top of the que
         addr, retaddr, args  = que.pop(0)
         # parse the adress into just the command by spitiling and disposing

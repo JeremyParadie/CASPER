@@ -75,7 +75,10 @@ def loop(que):
 
     while True:
         # if the que's first message is adressed to radio (may implememnt total loop through later)
-        if len(que) and que[0].startswith('radio'):
+        try:
+            que[0][0]
+        except: pass
+        if len(que) and que[0][0].startswith('radio'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing

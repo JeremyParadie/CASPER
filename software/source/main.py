@@ -52,7 +52,7 @@ def loop(que):
     while True:
 
         #if the que's first message is adressed to main (may implememnt total loop through later)
-        if len(que) and que[0].startswith('main'):
+        if len(que) and que[0][0].startswith('main'):
             # fetch the message from the top of the que
             addr, retaddr, args  = que.pop(0)
             # parse the adress into just the command by spitiling and disposing
@@ -71,4 +71,4 @@ if __name__ == '__main__':
     ti_thread.start()
     threading.Thread(target=loop, args=args, daemon=True).start()
 
-    ui.qt_loop(message_que)
+    ui.qt_loop()
