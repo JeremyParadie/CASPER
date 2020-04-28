@@ -1,5 +1,5 @@
 
-def send_command(time, command):
+def command(time, command):
     """
     desc: this the base funtion used to send commands to a robot, the first
         argument is the number of seconds after the trial starts the command
@@ -12,7 +12,7 @@ def send_command(time, command):
 def phase(time, name):
     """
     desc: this the base function used to send current phase, the first
-        argument is the number of seconds after the trial starts that 
+        argument is the number of seconds after the trial starts that
         this phase should start. the second argument is the name of the phase
         in quotes;
     """

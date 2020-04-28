@@ -19,14 +19,14 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
 
     def __init__(self, name="Default_Trial", trial= "./trials/default_trial.py", robot="./robots/example_squirrel.json"):
         self._name = name
-        self.trial = trial
-        self.robot = robot # loop over all the function definitions in this py file so that arg 2 can use it
+        self._trial = trial
+        self._robot = robot # loop over all the function definitions in this py file so that arg 2 can use it
         i = 0
-        csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
+        '''csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
         while (csvExists == True):
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
-        self.logger = Logger("logs/" + name + str(i) + ".csv")
+        self.logger = Logger("logs/" + name + str(i) + ".csv")'''
 
     @property
     def name(self):
@@ -34,7 +34,7 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
 
     def run(self):
         pass
-        #return subprocess.check_output([sys.executable, self.trial])
+        #return subprocess.check_output([sys.executable, self._trial])
 
     def compile_trial(self):
         """
@@ -57,22 +57,19 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
 
         # load the base most python functions for the trial script
         with open('./robots/base_robot_commands.py') as file:
-            exec(file.read(), locals=trial_locals)
+            exec(file.read(), trial_locals)
 
-        # load the base most python functions for the trial script
-        with open('./robots/base_robot_commands.py') as file:
-            exec(file.read(), locals=trial_locals)
 
         # load the robot specific  python functions for the trial script
         #repalce
-        robot_command_file_path = self.robot.replace('.json','.py')
-        if os.exits(robot_command_file_path):
+        robot_command_file_path = self._robot.replace('.json','.py')
+        if os.path.exists(robot_command_file_path):
             with open(robot_command_file_path) as file:
-                exec(file.read(), locals=trial_locals)
+                exec(file.read(), trial_locals)
 
         # run the trial and collects its output
         with open(self._trial) as file:
-            exec(file.read(), locals=trial_locals)
+            exec(file.read(), trial_locals)
 
         return robot_commands, phase_commands
 
