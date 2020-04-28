@@ -169,7 +169,10 @@ class MainWindow(QMainWindow):
         start = QPushButton("Start Trial")
         start.setMinimumWidth(50)
         start.pressed.connect(self.StartTrial)
+<<<<<<< HEAD
         self.left_pane.addWidget(start)
+=======
+>>>>>>> 76a3e9abfc84505650d614159a5126feee0aa845
         #upperButtons.addWidget(start)
 
         #load = QPushButton("Load Trial Type")
