@@ -12,7 +12,6 @@ import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from pathlib import Path
 
 row_length = 5
 input_height = 30
@@ -28,8 +27,7 @@ class MainWindow(QMainWindow):
         self.defaults = {}
         self.robot_fields = {}
         self.procedural_fields = {}
-        self.procedural_button_lists = []
-
+        self.procedural_button_list = []
         self.SetupWindow()
         
         
@@ -40,12 +38,17 @@ class MainWindow(QMainWindow):
         self.mainColumn = QVBoxLayout()
 
         #Create the toolbar and its widgets
-        toolbar = QToolBar()
+        toolbar = QToolBar("main_toolbar")
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
         #toolbar_spacer = QWidget()
         #toolbar_spacer.setSizePolicy(QSizePolicy())
+
+        save_action = QAction("save", self)
+        save_action.setStatusTip("Save entry fields")
+        save_action.triggered.connect(self.SaveEntries)
+        toolbar.addAction(save_action)
 
         battery_status = QLabel("Battery: ___%")
         toolbar.addWidget(battery_status)
@@ -58,6 +61,7 @@ class MainWindow(QMainWindow):
 
         self.left_pane = QVBoxLayout()
         self.right_pane = QVBoxLayout()
+        self.button_pane = QVBoxLayout()
         self.pane_wrapper = QHBoxLayout()
         self.mainColumn.addLayout(self.pane_wrapper)
         self.pane_wrapper.addLayout(self.left_pane)
@@ -143,6 +147,11 @@ class MainWindow(QMainWindow):
         self.procedural_pane = QVBoxLayout()
         self.left_pane.addLayout(self.procedural_pane)
 
+        start = QPushButton("Start Trial")
+        start.setMinimumWidth(50)
+        start.pressed.connect(self.Start)
+        self.left_pane.addWidget(start)
+
 
 
         phase_status = QLabel("Phase: X")
@@ -156,12 +165,7 @@ class MainWindow(QMainWindow):
 
         consoleLayout = QVBoxLayout()
         self.right_pane.addLayout(consoleLayout)
-
-
-        start = QPushButton("Start Trial")
-        start.setMinimumWidth(50)
-        start.pressed.connect(self.Start)
-        self.left_pane.addWidget(start)
+        self.right_pane.addLayout(self.button_pane)
 
         self.consoleLog = QTextEdit()
         self.consoleLog.setReadOnly(True)
@@ -205,6 +209,8 @@ class MainWindow(QMainWindow):
         self.SetupSubjectFields()
         self.ClearButtons()
         self.LoadSubjectJSON(False)
+        UI_active = False
+        self.close()
 
     def SelectTrial(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
@@ -261,6 +267,7 @@ class MainWindow(QMainWindow):
                 self.procedural_fields[field] = (label, entry_field, label_box)
 
                 self.procedural_pane.addLayout(label_box)
+                self.procedural_pane.update()
 
 
     def ClearSubjectFields(self):
@@ -268,10 +275,12 @@ class MainWindow(QMainWindow):
         for key in self.procedural_fields.keys():
             entry = self.procedural_fields[key]
             for i in reversed(range(entry[2].count())):
-                entry[2].itemAt(i).widget().setParent(None)
+                #entry[2].itemAt(i).widget().setParent(None)
+                entry[2].itemAt(i).widget().deleteLater()
         #for i in reversed(range(self.procedural_pane.count())): 
             #self.procedural_pane.itemAt(i).widget().setParent(None)
 
+        self.procedural_pane.update()
         self.procedural_fields.clear()
 
     def LoadSubjectJSON(self, manual = True):
@@ -306,14 +315,22 @@ class MainWindow(QMainWindow):
 
 
         for i in range(len(using_buttons_list)):
-
-            self.right_pane.addLayout(using_buttons_list[i])
+            self.procedural_button_list.append(using_buttons_list[i])
+            self.button_pane.addLayout(using_buttons_list[i])
     
     #Need to go over LoadSubjectJSON to see exactly what is where, and add back procedural buttons list
     def ClearButtons(self):
-        for i in reversed(range(self.right_pane.count())):
-            for x in reversed(range(len(self.procedural_button_lists[i]))):
-                self.procedural_button_lists[i].itemAt(x).widget().setParent(None)
+        #for i in range(len(self.procedural_button_list)):
+            #self.procedural_button_list[i].setParent(None)
+            #print("Scheduling ", self.procedural_button_list[i], " for deletion.")
+            #self.procedural_button_list[i].deleteLater()
+        #self.button_pane.update()
+
+        for i in range(len(self.procedural_button_list)):
+            for x in reversed(range(self.procedural_button_list[i].count())):
+                self.procedural_button_list[i].removeItem(self.procedural_button_list[i].itemAt(x))
+
+        self.procedural_button_list.clear()
 
     def ConsoleCommand(self):
         command = self.console.copy()
@@ -325,20 +342,23 @@ class MainWindow(QMainWindow):
         # Do the actual start stuff
 
         # Then save to defaults
-        print("Saving Defaults")
-        self.defaults["robot_path"] = self.robot_path.toPlainText()
-        self.defaults["subject_path"] = self.subject_path.toPlainText()
-        self.defaults["trial_path"] = self.trial_path.toPlainText()
+        self.SaveEntries()
 
-        for field in self.procedural_fields.keys():
-            print("Saving " + field)
-            self.defaults[field] = self.procedural_fields[field][1].toPlainText()
+        #self.LoadSubjectJSON(False)
 
-        with open(self.defaults_file_path, "w+") as dump_file:
-            json.dump(self.defaults, dump_file)
+    def SaveEntries(self):
+        # Save to defaults
+            print("Saving Defaults")
+            self.defaults["robot_path"] = self.robot_path.toPlainText()
+            self.defaults["subject_path"] = self.subject_path.toPlainText()
+            self.defaults["trial_path"] = self.trial_path.toPlainText()
 
-        self.LoadSubjectJSON(False)
+            for field in self.procedural_fields.keys():
+                print("Saving " + field)
+                self.defaults[field] = self.procedural_fields[field][1].toPlainText()
 
+            with open(self.defaults_file_path, "w+") as dump_file:
+                json.dump(self.defaults, dump_file)
 
 def loop(que):
 
@@ -359,12 +379,22 @@ def loop(que):
             # of the first item
             cmd = addr.split('.')[1:]
 
+def temp_loop():
+    while True:
+        if not UI_active:
+            app = QApplication(sys.argv)
 
+            window = MainWindow()
+            window.show()
+
+            app.exec_()
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    #app = QApplication(sys.argv)
 
-    window = MainWindow()
-    window.show()
+    #window = MainWindow()
+    #window.show()
 
-    app.exec_()
+    #app.exec_()
+    temp_loop()
+
