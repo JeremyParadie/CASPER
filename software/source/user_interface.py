@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         self.defaults = {}
         self.robot_fields = {}
         self.procedural_fields = {}
+        self.procedural_button_lists = []
 
         self.SetupWindow()
         
@@ -69,6 +70,7 @@ class MainWindow(QMainWindow):
         robot_button_box = QHBoxLayout()
         
         robot_label = QLabel("Robot")
+        robot_label.setStyleSheet("QLabel {font-size: 15px;}")
         
         self.robot_path = QTextEdit()
         self.robot_path.setReadOnly(True)
@@ -93,6 +95,7 @@ class MainWindow(QMainWindow):
         subject_button_box = QHBoxLayout()
         
         subject_label = QLabel("Subject")
+        subject_label.setStyleSheet("QLabel {font-size: 15px;}")
         
         self.subject_path = QTextEdit()
         self.subject_path.setReadOnly(True)
@@ -117,6 +120,7 @@ class MainWindow(QMainWindow):
         trial_button_box = QHBoxLayout()
         
         trial_label = QLabel("Trial")
+        trial_label.setStyleSheet("QLabel {font-size: 15px;}")
         
         self.trial_path = QTextEdit()
         self.trial_path.setReadOnly(True)
@@ -142,10 +146,11 @@ class MainWindow(QMainWindow):
 
 
         phase_status = QLabel("Phase: X")
-        phase_status.setStyleSheet("QLabel { min-width: 100% }")
+        phase_status.setStyleSheet("QLabel {font-size: 20px}")
         self.right_pane.addWidget(phase_status)
 
         time_display = QLabel("Time: 00:00:00")
+        time_display.setStyleSheet("QLabel {font-size: 20px}")
         self.right_pane.addWidget(time_display)
 
 
@@ -196,6 +201,10 @@ class MainWindow(QMainWindow):
         subject_file = open(selectedJSON[0], "r+")
         self.subject_fields = json.load(subject_file)
         subject_file.close()
+        self.ClearSubjectFields()
+        self.SetupSubjectFields()
+        self.ClearButtons()
+        self.LoadSubjectJSON(False)
 
     def SelectTrial(self):
         selectedJSON = QFileDialog.getOpenFileName(self, caption = "Select JSON", directory = "jsons/", filter = "JSON Files (*.json *.txt)")
@@ -237,6 +246,7 @@ class MainWindow(QMainWindow):
                 label_box = QVBoxLayout()
                 
                 label = QLabel(field)
+                label.setStyleSheet("QLabel {font-size: 15px;}")
                 
                 entry_field = QTextEdit()
                 entry_field.setMinimumHeight(input_height)
@@ -248,12 +258,21 @@ class MainWindow(QMainWindow):
                 label_box.addWidget(label)
                 label_box.addWidget(entry_field)
 
-                self.procedural_fields[field] = [label, entry_field]
+                self.procedural_fields[field] = (label, entry_field, label_box)
 
                 self.procedural_pane.addLayout(label_box)
 
 
+    def ClearSubjectFields(self):
 
+        for key in self.procedural_fields.keys():
+            entry = self.procedural_fields[key]
+            for i in reversed(range(entry[2].count())):
+                entry[2].itemAt(i).widget().setParent(None)
+        #for i in reversed(range(self.procedural_pane.count())): 
+            #self.procedural_pane.itemAt(i).widget().setParent(None)
+
+        self.procedural_fields.clear()
 
     def LoadSubjectJSON(self, manual = True):
         if manual == True:
@@ -274,21 +293,27 @@ class MainWindow(QMainWindow):
         using_buttons_list = []
         holder_list_index = 0
         button_index = 0
-        print(len(buttons["button_list"]))
+
         for button in buttons["button_list"]:
             button_widget = QPushButton(button)
             button_holder_list[holder_list_index].addWidget(button_widget)
             if button_holder_list[holder_list_index].count() >= 5:
                 using_buttons_list.append(button_holder_list[holder_list_index])
-                holder_list_index = holder_list_index+1
+                holder_list_index +=1
             elif button_index == len(buttons["button_list"])-1:
                 using_buttons_list.append(button_holder_list[holder_list_index])
             button_index += 1
 
-        print(len(using_buttons_list))
+
         for i in range(len(using_buttons_list)):
+
             self.right_pane.addLayout(using_buttons_list[i])
-                
+    
+    #Need to go over LoadSubjectJSON to see exactly what is where, and add back procedural buttons list
+    def ClearButtons(self):
+        for i in reversed(range(self.right_pane.count())):
+            for x in reversed(range(len(self.procedural_button_lists[i]))):
+                self.procedural_button_lists[i].itemAt(x).widget().setParent(None)
 
     def ConsoleCommand(self):
         command = self.console.copy()
@@ -311,6 +336,9 @@ class MainWindow(QMainWindow):
 
         with open(self.defaults_file_path, "w+") as dump_file:
             json.dump(self.defaults, dump_file)
+
+        self.LoadSubjectJSON(False)
+
 
 def loop(que):
 
