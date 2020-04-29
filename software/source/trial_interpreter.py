@@ -6,15 +6,6 @@ import csv
 # When instantiating a trial class both of the inputs, name and trial, should be included.
 #Their current defaults are for demonstration/testing purposes only.
 
-class Logger:
-
-    def __init__(self, csvFile):
-        self.log = open(csvFile, 'w+')
-        self.writer = csv.writer(self.log, delimiter=',')
-
-    def write(self, time, event):
-        self.writer.writerow([time, event])
-
 class Trial: # this will be an instance of a trial, re-instantiated for each new trial
 
     def __init__(self, name="Default_Trial", trial= "./trials/default_trial.py", robot="./robots/example_squirrel.json"):
@@ -22,11 +13,12 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
         self._trial = trial
         self._robot = robot # loop over all the function definitions in this py file so that arg 2 can use it
         i = 0
-        '''csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
+        csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
         while (csvExists == True):
             i = i + 1
             csvExists = os.path.isfile("logs/" + name + str(i) + ".csv")
-        self.logger = Logger("logs/" + name + str(i) + ".csv")'''
+        self.log = open("logs/" + name + str(i) + ".csv", 'w+')
+        self.writer = csv.writer(self.log, delimiter=',')
 
     @property
     def name(self):
@@ -35,6 +27,9 @@ class Trial: # this will be an instance of a trial, re-instantiated for each new
     def run(self):
         pass
         #return subprocess.check_output([sys.executable, self._trial])
+
+    def write(self, time, event):
+        self.writer.writerow([time, event])
 
     def compile_trial(self):
         """
