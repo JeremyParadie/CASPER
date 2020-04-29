@@ -74,6 +74,7 @@ def loop(que):
     possible commands:
         'trial.start' -> runs the specified trial file and returns its outputs
     arg inputs are it the order ('trialfile_path', 'subject_path', 'robot_path', {dict of subject information})
+        'trial.log -> writes event to log file. arg inputs are in the order ('time', 'event to log')
         'trial.end' -> closes the open log file for the current trial, and stops trial
     """
     current_trial = Trial()
@@ -91,9 +92,11 @@ def loop(que):
 
             que.append((retaddr, None, current_trial.run()))
 
+        elif cmd_type == 'log':
+            current_trial.write(args[0], args[1])
 
         elif cmd_type == 'end':
-            current_trial.logger.log.close()
+            current_trial.log.close()
 
             que.append((retaddr, None, "Trial Ended"))
         else:
